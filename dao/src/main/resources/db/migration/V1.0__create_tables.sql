@@ -9,6 +9,13 @@ CREATE TABLE Users
     PRIMARY KEY (UserID)
 );
 
+CREATE TABLE Apps
+(
+    appID bigint(20) NOT NULL,
+    appName varchar(32) NOT NULL,
+    PRIMARY KEY (appID)
+);
+
 CREATE TABLE Roles
 (
     rolID bigint(20) NOT NULL,
@@ -53,9 +60,3 @@ CREATE TABLE RolePermissions
     FOREIGN KEY (permissionID) REFERENCES Permissions(permissionID)
 );
 
-CREATE TABLE Apps
-(
-    appID bigint(20) NOT NULL,
-    appName varchar(32) NOT NULL,
-    PRIMARY KEY (appID)
-);

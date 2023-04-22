@@ -1,6 +1,6 @@
 spring:
   datasource:
-    driverClassName: com.mysql.cj.jdbc.Driver
+    driverClassName: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/security_vigacat
     username: vigacat_admin
     password: v1g4c4t
@@ -8,11 +8,12 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  flyway:
-    url: jdbc:mysql://localhost:3306/mysql
-    schemas: security_vigacat
-    user: "vigacat_admin"
-    password: "v1g4c4t"
+
+flyway:
+  url: jdbc:mysql://localhost:3306/mysql
+  schemas: security_vigacat
+  user: "vigacat_admin"
+  password: "v1g4c4t"
 
 logging:
   level:
