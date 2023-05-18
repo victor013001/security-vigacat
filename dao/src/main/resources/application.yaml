@@ -14,7 +14,3 @@ flyway:
   schemas: security_vigacat
   user: "vigacat_admin"
   password: "v1g4c4t"
-
-logging:
-  level:
-    root: debug

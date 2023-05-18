@@ -6,3 +6,7 @@ spring:
   server:
     port: 8081
     servlet.contextPath: /vigacat-security
+
+logging:
+  level:
+    root: info
