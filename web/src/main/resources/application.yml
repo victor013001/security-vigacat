@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: vigacat
+  profiles:
+    active: local
+  server:
+    port: 8081
+    servlet.contextPath: /vigacat-security
