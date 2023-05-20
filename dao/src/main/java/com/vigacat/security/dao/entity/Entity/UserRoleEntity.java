@@ -2,9 +2,8 @@ package com.vigacat.security.dao.entity.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "UserRoles")
@@ -12,12 +11,23 @@ import java.time.LocalDate;
 public class UserRoleEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "userRoleID")
   private Long userRoleId;
-  private Long userId;
-  private Long roleId;
-  @CreatedDate
-  private LocalDate createdAt;
-  private LocalDate updatedAt;
+
+  @ManyToOne
+  @Column(name = "userID")
+  private UserEntity userId;
+
+  @ManyToOne
+  @Column(name = "roleID")
+  private RoleEntity roleId;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private LocalDateTime createdAt;
+
+  private LocalDateTime updatedAt;
+
   private Long createdBy;
+
   private Long updatedBy;
 }

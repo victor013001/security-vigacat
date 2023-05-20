@@ -1,26 +1,36 @@
 package com.vigacat.security.dao.entity.Entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
 @Data
-@Builder
 public class UserEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "userID")
   private Long userId;
+
   private String userName;
+
+  private String userEmail;
+
   private String password;
-  @CreatedDate
-  private LocalDate createdAt;
-  private LocalDate updatedAt;
+
+  @OneToMany
+  private List<UserRoleEntity> userRoleId;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private LocalDateTime createdAt;
+
+  private LocalDateTime updatedAt;
+
   private Long createdBy;
+
   private Long updatedBy;
 }
