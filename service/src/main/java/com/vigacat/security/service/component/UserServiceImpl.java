@@ -19,4 +19,9 @@ public class UserServiceImpl implements UserService{
         return userPersistence.getUserByUsernameAndApp(username, appId);
     }
 
+    @Override
+    public UserDto getUserWithoutFetch(String username, Long appId) {
+        return userPersistence.getUser(username, appId);
+    }
+
 }

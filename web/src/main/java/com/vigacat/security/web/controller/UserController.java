@@ -22,4 +22,11 @@ public class UserController {
         return userService.getUser(username, appId);
     }
 
+    @GetMapping(path = "/no-relations")
+    public UserDto getUserSimple(
+            @RequestParam(name = "username") String username,
+            @RequestParam(name = "app-id") Long appId) {
+        return userService.getUserWithoutFetch(username, appId);
+    }
+
 }

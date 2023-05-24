@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             " AND u.name = :username")
     Optional<User> findUserByUsernameAndAppId(@Param("username") String username, @Param("appId") Long appId);
 
+    Optional<User> findByNameAndRolesAppId(String name, Long id);
+
 }

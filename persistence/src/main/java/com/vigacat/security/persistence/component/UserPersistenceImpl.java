@@ -22,4 +22,12 @@ public class UserPersistenceImpl implements UserPersistence {
                 .orElseThrow();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUser(String username, Long appId) {
+        return userRepository.findByNameAndRolesAppId(username, appId)
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .orElseThrow();
+    }
+
 }
