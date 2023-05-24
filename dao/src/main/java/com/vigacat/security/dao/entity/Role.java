@@ -1,9 +1,7 @@
 package com.vigacat.security.dao.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +10,8 @@ import java.util.List;
 @EqualsAndHashCode
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Role extends AuditedEntity {
 
     @GeneratedValue
