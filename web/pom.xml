@@ -26,8 +26,8 @@
 
         <!-- INTERNAL -->
         <dependency>
-            <groupId>com.vigacat.security.dao</groupId>
-            <artifactId>dao</artifactId>
+            <groupId>com.vigacat.security.service</groupId>
+            <artifactId>service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
