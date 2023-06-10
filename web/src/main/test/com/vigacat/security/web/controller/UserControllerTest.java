@@ -1,69 +1,89 @@
 package com.vigacat.security.web.controller;
 
-import com.vigacat.security.dao.entity.User;
-import com.vigacat.security.dao.repository.UserRepository;
-import com.vigacat.security.persistence.component.UserPersistenceImpl;
+import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
-import com.vigacat.security.service.component.UserServiceImpl;
+import com.vigacat.security.service.component.UserService;
+import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Optional;
+import java.util.List;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
-@WebMvcTest(UserController.class)
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
 
-  @Autowired
+  @InjectMocks
+  private UserController userController;
+
+  @Mock
+  private UserService userService;
+
   private MockMvc mockMvc;
 
-  @InjectMocks
-  private UserServiceImpl userService;
-
-  @InjectMocks
-  private UserPersistenceImpl userPersistence;
-
-  @Mock
-  private UserRepository userRepository;
-
-  @Mock
-  private ModelMapper modelMapper;
-
-  @Test
-  public void getUser() throws
-      Exception {
-
-    String userName = "victor";
-    Long appId = 1L;
-
-    when(userRepository.findUserByUsernameAndAppId(userName,appId)).thenReturn(Optional.of(User.builder().id(1L).email(
-        "victor@gmail.com").name("victor").roles(null).build()));
-
-    when(userPersistence.getUserByUsernameAndApp(userName,
-        appId)).thenReturn(userRepository.findUserByUsernameAndAppId(userName,appId).map(user -> modelMapper.map(user,
-                                             UserDto.class))
-                                      .orElseThrow());
-
-    when(userService.getUser(userName,
-        appId)).thenReturn(userPersistence.getUser("victor",1L));
-
-
-    this.mockMvc.perform(get("/user").param("username", userName).param("app-id",
-        String.valueOf(appId)
-    )).andDo(print()).andExpect(status().isOk());
+  @Before
+  public void setUp() {
+    mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
   }
 
+  @Test
+  public void getUser() throws Exception {
+
+    String userNameVictor = "victor";
+
+    UserDto userDtoVictor = UserDto.builder()
+        .name(userNameVictor)
+        .email("victor@gmail.com")
+        .roles(List.of(RoleDto.builder().name("Admin").permissions(null).build()))
+        .build();
+
+    Mockito.when(userService.getUser(
+            userNameVictor,
+            1L))
+        .thenReturn(userDtoVictor);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/user")
+            .param("username", userNameVictor)
+            .param("app-id", "1")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(userNameVictor)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name").value(Matchers.is("Admin")))
+        .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  public void getUserSimple() throws Exception {
+
+    String userNameVictor = "victor";
+
+    UserDto userDtoVictor = UserDto.builder()
+        .name(userNameVictor)
+        .email("victor@gmail.com")
+        .build();
+
+    Mockito.when(userService.getUserWithoutFetch(
+            userNameVictor,
+            1L))
+        .thenReturn(userDtoVictor);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/user/no-relations")
+            .param("username", userNameVictor)
+            .param("app-id", "1")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+            .value(Matchers.is(userNameVictor)))
+        .andDo(MockMvcResultHandlers.print());
+  }
 }
