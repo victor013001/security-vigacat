@@ -20,7 +20,7 @@ public class TokenRequestFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION_NAME);
+        //final String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION_NAME);
 
         //Extract the token
         //Validate token

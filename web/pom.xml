@@ -32,6 +32,8 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- EXTERNAL -->
+
         <!-- INTERNAL -->
         <dependency>
             <groupId>com.vigacat.security.service</groupId>
