@@ -5,6 +5,7 @@ import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
