@@ -20,9 +20,6 @@ public class UserPersistenceImplTest {
   @InjectMocks
   private UserPersistenceImpl userPersistence;
 
-  @InjectMocks
-  private UserDto userDto;
-
   @Mock
   private ModelMapper modelMapper;
 
@@ -43,7 +40,7 @@ public class UserPersistenceImplTest {
         .roles(null)
         .build();
 
-    UserDto userVictorDto = userDto.builder()
+    UserDto userVictorDto = UserDto.builder()
         .name(userNameVictor)
         .email(emailVictor)
         .roles(null)
