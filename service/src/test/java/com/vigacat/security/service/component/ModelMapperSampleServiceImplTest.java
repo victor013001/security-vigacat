@@ -23,11 +23,6 @@ public class ModelMapperSampleServiceImplTest {
   @Test
   public void getSampleMappedObjectTest() {
 
-    SampleDto1 sampleDto1 = SampleDto1.builder()
-        .id(1L)
-        .name("name dto 1")
-        .build();
-
     SampleDto2 sampleDto2 = SampleDto2.builder()
         .id(1L)
         .name("name dto 1")

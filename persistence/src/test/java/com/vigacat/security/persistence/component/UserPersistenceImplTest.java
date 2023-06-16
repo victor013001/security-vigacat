@@ -43,7 +43,7 @@ public class UserPersistenceImplTest {
         .roles(null)
         .build();
 
-    UserDto userVictorDto = UserDto.builder()
+    UserDto userVictorDto = userDto.builder()
         .name(userNameVictor)
         .email(emailVictor)
         .roles(null)
