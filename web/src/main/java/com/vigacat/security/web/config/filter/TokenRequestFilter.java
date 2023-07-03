@@ -1,6 +1,5 @@
 package com.vigacat.security.web.config.filter;
 
-import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.TokenDto;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.service.component.UserService;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -56,7 +56,15 @@ public class TokenRequestFilter extends OncePerRequestFilter {
 
     private Set<GrantedAuthority> createAuthorities(UserDto userDto) {
         return userDto.getRoles().stream()
-                .map(RoleDto::getName)
+                .flatMap(roleDto ->
+                    Stream.concat(
+                        Stream.of("role::".concat(roleDto.getName())),
+                        roleDto.getPermissions().stream()
+                            .map(permissionDto ->
+                                "permission::".concat(permissionDto.getPermission())
+                                )
+                    )
+                )
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
