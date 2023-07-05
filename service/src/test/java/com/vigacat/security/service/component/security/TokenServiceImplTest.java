@@ -1,7 +1,6 @@
 package com.vigacat.security.service.component.security;
 
-import com.vigacat.security.persistence.component.TokenPersistence;
-import com.vigacat.security.persistence.component.UserPersistenceImpl;
+import com.vigacat.security.persistence.component.TokenPersistenceImpl;
 import com.vigacat.security.persistence.dto.TokenDto;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -22,7 +21,7 @@ public class TokenServiceImplTest {
     private TokenServiceImpl tokenService;
 
     @Mock
-    private TokenPersistence tokenPersistence;
+    private TokenPersistenceImpl tokenPersistence;
 
 
     @Test
@@ -49,7 +48,6 @@ public class TokenServiceImplTest {
                 .hasFieldOrPropertyWithValue("username", usernameVictor)
                 .hasFieldOrPropertyWithValue("token", tokenVictor)
                 .hasFieldOrPropertyWithValue("expiresAt", tokenVictorExpiresAt);
-
     }
 
 }

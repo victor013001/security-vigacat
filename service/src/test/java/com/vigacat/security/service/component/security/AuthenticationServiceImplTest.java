@@ -1,5 +1,6 @@
 package com.vigacat.security.service.component.security;
 
+import com.vigacat.security.persistence.component.PermissionPersistence;
 import com.vigacat.security.persistence.component.UserPersistenceImpl;
 import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
@@ -15,29 +16,27 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AuthenticationServiceTest {
+public class AuthenticationServiceImplTest {
 
     @InjectMocks
-    private AuthenticationService authenticationService;
+    private AuthenticationServiceImpl authenticationService;
 
     @Mock
     private UserPersistenceImpl userPersistence;
+    @Mock
+    private PermissionPersistence permissionPersistence;
 
     @Test
     public void buildAuthentication() {
         String usernameVictor = "victor";
         String tokenVictor = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
-        LocalDateTime tokenVictorExpiresAt = LocalDateTime.now().plus(60L, ChronoUnit.MINUTES);
 
         final TokenDto tokenDtoVictor = TokenDto.builder()
                 .username(usernameVictor)
                 .token(tokenVictor)
-                .expiresAt(tokenVictorExpiresAt)
                 .build();
 
         final PermissionDto permissionDtoRead = PermissionDto.builder()
@@ -50,8 +49,11 @@ public class AuthenticationServiceTest {
 
 
         final RoleDto roleDtoAdmin = RoleDto.builder()
+                .id(1L)
                 .name("Admin")
-                .permissions(List.of(permissionDtoRead, permissionDtoCreate))
+                .permissions(List.of(
+                        permissionDtoRead,
+                        permissionDtoCreate))
                 .build();
 
         final UserDto userDtoVictor = UserDto.builder()
@@ -59,14 +61,27 @@ public class AuthenticationServiceTest {
                 .roles(List.of(roleDtoAdmin))
                 .build();
 
+        final List<Long> roleIds = List.of(1L);
+
+        final List<PermissionDto> permissionDtoList = List.of(
+                permissionDtoRead,
+                permissionDtoCreate
+        );
+
         Mockito.when(userPersistence.getUserByUsernameAndApp(usernameVictor, 1L))
                 .thenReturn(userDtoVictor);
+
+        Mockito.when(permissionPersistence.getPermissionsByRoleIds(roleIds))
+                .thenReturn(permissionDtoList);
 
 
         final Authentication authenticationVictor = authenticationService.buildAuthentication(tokenDtoVictor, 1L);
 
         Mockito.verify(userPersistence)
                 .getUserByUsernameAndApp(usernameVictor, 1L);
+
+        Mockito.verify(permissionPersistence)
+                        .getPermissionsByRoleIds(roleIds);
 
         Assertions.assertThat(authenticationVictor.getAuthorities())
                 .extracting(GrantedAuthority::getAuthority)
@@ -76,4 +91,5 @@ public class AuthenticationServiceTest {
                         "permission::Read"
                 );
     }
+
 }
