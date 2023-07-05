@@ -17,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('role::Administrator','permission::SEC_QUERY_USERS')")
+    @PreAuthorize("hasAnyAuthority('permission::SEC_QUERY_USERS')")
     public UserDto getUser(
             @RequestParam(name = "username") String username,
             @RequestParam(name = "app-id") Long appId) {

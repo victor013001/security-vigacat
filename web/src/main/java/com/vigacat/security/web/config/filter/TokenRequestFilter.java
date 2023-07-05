@@ -1,6 +1,7 @@
 package com.vigacat.security.web.config.filter;
 
 import com.vigacat.security.persistence.dto.TokenDto;
+import com.vigacat.security.service.component.security.IAuthenticationService;
 import com.vigacat.security.service.component.security.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +23,7 @@ public class TokenRequestFilter extends OncePerRequestFilter {
     private static final String HEADER_APPLICATION_NAME = "app_id";
 
     private final TokenService tokenService;
+    private final IAuthenticationService authenticationService;
 
     @Override
     protected void doFilterInternal(
@@ -34,7 +36,7 @@ public class TokenRequestFilter extends OncePerRequestFilter {
         if(Objects.nonNull(authorizationHeader)) {
             final TokenDto tokenDto = tokenService.getValidToken(authorizationHeader);
             final Long applicationId = Long.valueOf(request.getHeader(HEADER_APPLICATION_NAME));
-            final Authentication authentication = tokenService.buildAuthentication(tokenDto, applicationId);
+            final Authentication authentication = authenticationService.buildAuthentication(tokenDto, applicationId);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
