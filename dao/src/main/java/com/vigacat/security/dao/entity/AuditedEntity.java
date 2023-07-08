@@ -1,11 +1,13 @@
 package com.vigacat.security.dao.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@MappedSuperclass
 public abstract class AuditedEntity {
 
     @Column

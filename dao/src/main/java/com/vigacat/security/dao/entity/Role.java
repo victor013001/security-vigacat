@@ -12,9 +12,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Role extends AuditedEntity {
 
-    @GeneratedValue
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     @Id
     private Long id;
