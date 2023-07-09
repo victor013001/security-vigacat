@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "role")
-@EqualsAndHashCode
+@EqualsAndHashCode (callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
