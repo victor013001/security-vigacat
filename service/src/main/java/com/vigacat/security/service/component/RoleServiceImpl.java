@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @Service
@@ -24,6 +25,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleDto createNewRole(String roleNameDto, List<String> rolePermissionNames, String authorization, Long appId) {
+
+        if (roleNameDto.isEmpty() || rolePermissionNames.isEmpty()) {
+            throw new InvalidParameterException("All parameters are required");
+        }
 
         if (rolePersistence.getRoleByNameAndAppId(roleNameDto, appId).isPresent()) {
             throw new DuplicateKeyException("Role already exist");
