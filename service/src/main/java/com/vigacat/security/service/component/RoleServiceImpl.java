@@ -36,14 +36,14 @@ public class RoleServiceImpl implements RoleService {
 
         List<PermissionDto> permissionsDto = permissionService.getPermissionsByName(rolePermissionNames);
 
-        String username = tokenService.getValidToken(authorization).getUsername();
+        String usernameToken = tokenService.getValidToken(authorization).getUsername();
 
         RoleDto roleDto = RoleDto.builder()
                 .name(roleNameDto)
                 .permissions(permissionsDto)
                 .build();
 
-        log.info("{} Save role with name {} and app id {}, created by {}", LOG_PREFIX, roleNameDto, appId, username);
-        return rolePersistence.saveNewRole(roleDto, username, appId);
+        log.info("{} Save role with name {} and app id {}, created by {}", LOG_PREFIX, roleNameDto, appId, usernameToken);
+        return rolePersistence.saveNewRole(roleDto, usernameToken, appId);
     }
 }

@@ -29,13 +29,13 @@ public class RolePersistenceImpl implements RolePersistence {
 
     @Override
     @Transactional
-    public RoleDto saveNewRole(RoleDto roleDto, String username, Long appId) {
+    public RoleDto saveNewRole(RoleDto roleDto, String usernameToken, Long appId) {
 
         Role roleToSave = modelMapper.map(roleDto, Role.class);
         roleToSave.setApp(App.builder()
                 .id(appId)
                 .build());
-        roleToSave.setCreatedBy(username);
+        roleToSave.setCreatedBy(usernameToken);
         roleToSave.setCreatedAt(LocalDateTime.now());
 
         return modelMapper.map(roleRepository.save(roleToSave), RoleDto.class);
