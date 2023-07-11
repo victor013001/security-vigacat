@@ -8,4 +8,6 @@ public interface RoleService {
 
     RoleDto createNewRole(String roleNameDto, List<String> rolePermissionsDto, String authorization, Long appId);
 
+    List<RoleDto> getRolesByIds(List<Long> roleIds);
+
 }

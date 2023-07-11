@@ -46,4 +46,18 @@ public class RoleServiceImpl implements RoleService {
         log.info("{} Save role with name {} and app id {}, created by {}", LOG_PREFIX, roleNameDto, appId, usernameToken);
         return rolePersistence.saveNewRole(roleDto, usernameToken, appId);
     }
+
+    @Override
+    public List<RoleDto> getRolesByIds(List<Long> roleIds) {
+
+        log.info("{} Get roles by ids", LOG_PREFIX);
+
+        List<RoleDto> roleDtos = rolePersistence.getRolesById(roleIds);
+
+        if (roleIds.size() != roleDtos.size()) {
+            throw new InvalidParameterException("Roles doesn't exist");
+        }
+
+        return roleDtos;
+    }
 }

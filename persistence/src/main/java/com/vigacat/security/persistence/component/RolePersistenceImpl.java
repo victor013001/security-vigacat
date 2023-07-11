@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class RolePersistenceImpl implements RolePersistence {
     @Override
     @Transactional(readOnly = true)
     public Optional<RoleDto> getRoleByNameAndAppId(String roleName, Long appId) {
-        return roleRepository.findByNameAndAppId(roleName,appId)
+        return roleRepository.findByNameAndAppId(roleName, appId)
                 .map(role -> modelMapper.map(role, RoleDto.class));
     }
 
@@ -41,5 +43,12 @@ public class RolePersistenceImpl implements RolePersistence {
         return modelMapper.map(roleRepository.save(roleToSave), RoleDto.class);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoleDto> getRolesById(List<Long> roleIds) {
+        return roleRepository.findRolesByIdIn(roleIds).stream()
+                .map(role -> modelMapper.map(role, RoleDto.class))
+                .collect(Collectors.toList());
+    }
 
 }
