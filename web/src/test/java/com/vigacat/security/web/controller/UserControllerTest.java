@@ -1,8 +1,11 @@
 package com.vigacat.security.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
+import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.service.component.UserService;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,67 +26,118 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
 
-  @InjectMocks
-  private UserController userController;
+    @InjectMocks
+    private UserController userController;
 
-  @Mock
-  private UserService userService;
+    @Mock
+    private UserService userService;
 
-  private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-  @Before
-  public void setUp() {
-    mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-  }
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    }
 
-  @Test
-  public void getUser() throws Exception {
+    @Test
+    public void getUser() throws Exception {
 
-    String userNameVictor = "victor";
+        String userNameVictor = "victor";
 
-    UserDto userDtoVictor = UserDto.builder()
-            .name(userNameVictor)
-            .email("victor@gmail.com")
-            .roles(List.of(RoleDto.builder().name("Admin").permissions(null).build()))
-            .build();
+        UserDto userDtoVictor = UserDto.builder()
+                .name(userNameVictor)
+                .email("victor@gmail.com")
+                .roles(List.of(RoleDto.builder().name("Admin").permissions(null).build()))
+                .build();
 
-    Mockito.when(userService.getUser(
-                    userNameVictor,
-                    1L))
-            .thenReturn(userDtoVictor);
+        Mockito.when(userService.getUser(
+                        userNameVictor,
+                        1L))
+                .thenReturn(userDtoVictor);
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/user")
-                    .param("username", userNameVictor)
-                    .param("app-id", "1")
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(userNameVictor)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name").value(Matchers.is("Admin")))
-            .andDo(MockMvcResultHandlers.print());
-  }
+        mockMvc.perform(MockMvcRequestBuilders.get("/user")
+                        .param("username", userNameVictor)
+                        .param("app-id", "1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(userNameVictor)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name").value(Matchers.is("Admin")))
+                .andDo(MockMvcResultHandlers.print());
+    }
 
-  @Test
-  public void getUserSimple() throws Exception {
+    @Test
+    public void getUserSimple() throws Exception {
 
-    String userNameVictor = "victor";
+        String userNameVictor = "victor";
 
-    UserDto userDtoVictor = UserDto.builder()
-            .name(userNameVictor)
-            .email("victor@gmail.com")
-            .build();
+        UserDto userDtoVictor = UserDto.builder()
+                .name(userNameVictor)
+                .email("victor@gmail.com")
+                .build();
 
-    Mockito.when(userService.getUserWithoutFetch(
-                    userNameVictor,
-                    1L))
-            .thenReturn(userDtoVictor);
+        Mockito.when(userService.getUserWithoutFetch(
+                        userNameVictor,
+                        1L))
+                .thenReturn(userDtoVictor);
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/user/no-relations")
-                    .param("username", userNameVictor)
-                    .param("app-id", "1")
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.name")
-                    .value(Matchers.is(userNameVictor)))
-            .andDo(MockMvcResultHandlers.print());
-  }
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/no-relations")
+                        .param("username", userNameVictor)
+                        .param("app-id", "1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                        .value(Matchers.is(userNameVictor)))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void createNewUser() throws Exception {
+
+        String username = "user";
+        String userEmail = "user@email.com";
+        String userPassword = "password";
+        String tokenAdmin = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
+
+
+        List<RoleDto> userRolesDtos = List.of(
+                RoleDto.builder()
+                        .id(1L)
+                        .build(),
+                RoleDto.builder()
+                        .id(2L)
+                        .build()
+        );
+
+        UserToSaveDto userToSaveDto = UserToSaveDto.builder()
+                .name(username)
+                .email(userEmail)
+                .password(userPassword)
+                .roles(userRolesDtos)
+                .build();
+
+        UserDto userDto = UserDto.builder()
+                .name(username)
+                .email(userEmail)
+                .roles(userRolesDtos)
+                .build();
+
+        String userToSaveJson = new ObjectMapper().writeValueAsString(userToSaveDto);
+        String userDtoJson = new ObjectMapper().writeValueAsString(userDto);
+
+        Mockito.when(userService.createNewUser(userToSaveDto, tokenAdmin))
+                .thenReturn(userDto);
+
+        final String userDtoResponse = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                        .header("Authorization", tokenAdmin)
+                        .content(userToSaveJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Assertions.assertThat(userDtoResponse)
+                .isEqualTo(userDtoJson);
+    }
+
 }

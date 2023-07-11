@@ -92,4 +92,32 @@ public class RoleServiceImplTest {
         Assertions.assertThat(roleDtoUserResponse)
                 .isEqualTo(roleDtoUser);
     }
+
+    @Test
+    public void getRolesByIds() {
+
+        List<Long> roleIds = List.of(1L, 2L);
+
+        List<RoleDto> roleDtos = List.of(
+                RoleDto.builder()
+                        .id(1L)
+                        .build(),
+                RoleDto.builder()
+                        .id(2L)
+                        .build()
+        );
+
+        Mockito.when(rolePersistence.getRolesById(roleIds))
+                .thenReturn(roleDtos);
+
+        final List<RoleDto> roleDtosResponse = roleService.getRolesByIds(roleIds);
+
+        Mockito.verify(rolePersistence)
+                .getRolesById(roleIds);
+
+        Assertions.assertThat(roleDtosResponse)
+                .extracting(RoleDto::getId)
+                .contains(1L, 2L);
+    }
+
 }

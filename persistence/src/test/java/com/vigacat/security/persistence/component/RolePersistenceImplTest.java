@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,16 +44,16 @@ public class RolePersistenceImplTest {
         Mockito.when(roleRepository.findByNameAndAppId(roleAdminName, appId))
                 .thenReturn(Optional.of(adminRole));
 
-        Mockito.when(modelMapper.map(Mockito.any(Role.class),Mockito.eq(RoleDto.class)))
+        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
                 .thenReturn(adminRoleDto);
 
-        final Optional<RoleDto> adminRoleDtoResponse = rolePersistence.getRoleByNameAndAppId(roleAdminName,appId);
+        final Optional<RoleDto> adminRoleDtoResponse = rolePersistence.getRoleByNameAndAppId(roleAdminName, appId);
 
         Mockito.verify(roleRepository)
-                .findByNameAndAppId(roleAdminName,appId);
+                .findByNameAndAppId(roleAdminName, appId);
 
         Mockito.verify(modelMapper)
-                .map(Mockito.any(Role.class),Mockito.eq(RoleDto.class));
+                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
 
         Assertions.assertThat(adminRoleDtoResponse)
                 .contains(adminRoleDto);
@@ -72,25 +73,68 @@ public class RolePersistenceImplTest {
                 .name(roleAdminName)
                 .build();
 
-        Mockito.when(modelMapper.map(Mockito.any(RoleDto.class),Mockito.eq(Role.class)))
+        Mockito.when(modelMapper.map(Mockito.any(RoleDto.class), Mockito.eq(Role.class)))
                 .thenReturn(adminRole);
 
         Mockito.when(roleRepository.save(adminRole))
-                        .thenReturn(adminRole);
+                .thenReturn(adminRole);
 
-        Mockito.when(modelMapper.map(Mockito.any(Role.class),Mockito.eq(RoleDto.class)))
+        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
                 .thenReturn(adminRoleDto);
 
         final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(adminRoleDto, usernameAdmin, 1L);
 
         Mockito.verify(modelMapper)
-                .map(Mockito.any(RoleDto.class),Mockito.eq(Role.class));
+                .map(Mockito.any(RoleDto.class), Mockito.eq(Role.class));
 
         Mockito.verify(modelMapper)
-                .map(Mockito.any(Role.class),Mockito.eq(RoleDto.class));
+                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
 
         Assertions.assertThat(adminRoleDtoResponse)
                 .hasFieldOrPropertyWithValue("name", roleAdminName);
+    }
+
+    @Test
+    public void getRolesById() {
+
+        List<Long> roleIds = List.of(1L, 2L);
+
+        List<Role> roles = List.of(
+                Role.builder()
+                        .id(1L)
+                        .build(),
+                Role.builder()
+                        .id(2L)
+                        .build()
+        );
+
+        List<RoleDto> roleDtos = List.of(
+                RoleDto.builder()
+                        .id(1L)
+                        .build(),
+                RoleDto.builder()
+                        .id(2L)
+                        .build()
+        );
+
+
+        Mockito.when(roleRepository.findRolesByIdIn(roleIds))
+                .thenReturn(roles);
+
+        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
+                .thenReturn(roleDtos.get(0), roleDtos.get(1));
+
+        final List<RoleDto> roleDtosResponse = rolePersistence.getRolesById(roleIds);
+
+        Mockito.verify(roleRepository)
+                .findRolesByIdIn(roleIds);
+
+        Mockito.verify(modelMapper, Mockito.times(2))
+                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
+
+        Assertions.assertThat(roleDtosResponse)
+                .extracting(RoleDto::getId)
+                .contains(1L, 2L);
     }
 
 }
