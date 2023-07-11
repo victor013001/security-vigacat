@@ -15,7 +15,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('role::Administrator')")
+    @PreAuthorize("hasAnyAuthority('permission::SEC_CREATE_ROLES')")
     public RoleDto createNewRole(@RequestHeader("Authorization") String authorization,
                                  @RequestHeader("app_id") Long appId,
                                  @RequestBody RoleRequest roleRequest) {
