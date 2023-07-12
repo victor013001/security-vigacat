@@ -31,7 +31,7 @@ public class UserServiceImplTest {
                "victor",
                1L
            );
-    Assertions.assertThat(userDtoResponse).hasFieldOrPropertyWithValue("name", "Victor").hasFieldOrPropertyWithValue(
+    Assertions.assertThat(userDtoResponse).hasFieldOrPropertyWithValue("name", "victor").hasFieldOrPropertyWithValue(
         "email","victor@gmail.com");
   }
 

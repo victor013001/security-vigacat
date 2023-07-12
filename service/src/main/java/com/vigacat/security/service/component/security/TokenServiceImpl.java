@@ -1,6 +1,6 @@
 package com.vigacat.security.service.component.security;
 
-import com.vigacat.security.persistence.component.ITokenPersistence;
+import com.vigacat.security.persistence.component.TokenPersistence;
 import com.vigacat.security.persistence.dto.TokenDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,8 @@ public class TokenServiceImpl implements TokenService {
 
     private static final Long TOKEN_DURATION_MINUTES = 60L;
 
-    private final ITokenPersistence tokenPersistence;
+
+    private final TokenPersistence tokenPersistence;
 
     @Override
     public String createToken(String username) {
@@ -41,7 +42,6 @@ public class TokenServiceImpl implements TokenService {
         } else {
             throw new BadCredentialsException("Expired");
         }
-
     }
 
 }

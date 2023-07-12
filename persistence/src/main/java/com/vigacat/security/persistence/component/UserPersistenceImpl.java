@@ -39,4 +39,5 @@ public class UserPersistenceImpl implements UserPersistence {
                 .map(user -> modelMapper.map(user, UsernamePasswordDto.class));
     }
 
+
 }

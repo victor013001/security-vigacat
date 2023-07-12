@@ -6,4 +6,5 @@ public interface TokenService {
     String createToken(String username);
 
     TokenDto getValidToken(String token);
+
 }

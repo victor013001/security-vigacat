@@ -42,24 +42,24 @@ public class UserControllerTest {
     String userNameVictor = "victor";
 
     UserDto userDtoVictor = UserDto.builder()
-        .name(userNameVictor)
-        .email("victor@gmail.com")
-        .roles(List.of(RoleDto.builder().name("Admin").permissions(null).build()))
-        .build();
+            .name(userNameVictor)
+            .email("victor@gmail.com")
+            .roles(List.of(RoleDto.builder().name("Admin").permissions(null).build()))
+            .build();
 
     Mockito.when(userService.getUser(
-            userNameVictor,
-            1L))
-        .thenReturn(userDtoVictor);
+                    userNameVictor,
+                    1L))
+            .thenReturn(userDtoVictor);
 
     mockMvc.perform(MockMvcRequestBuilders.get("/user")
-            .param("username", userNameVictor)
-            .param("app-id", "1")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(userNameVictor)))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name").value(Matchers.is("Admin")))
-        .andDo(MockMvcResultHandlers.print());
+                    .param("username", userNameVictor)
+                    .param("app-id", "1")
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(userNameVictor)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name").value(Matchers.is("Admin")))
+            .andDo(MockMvcResultHandlers.print());
   }
 
   @Test
@@ -68,22 +68,22 @@ public class UserControllerTest {
     String userNameVictor = "victor";
 
     UserDto userDtoVictor = UserDto.builder()
-        .name(userNameVictor)
-        .email("victor@gmail.com")
-        .build();
+            .name(userNameVictor)
+            .email("victor@gmail.com")
+            .build();
 
     Mockito.when(userService.getUserWithoutFetch(
-            userNameVictor,
-            1L))
-        .thenReturn(userDtoVictor);
+                    userNameVictor,
+                    1L))
+            .thenReturn(userDtoVictor);
 
     mockMvc.perform(MockMvcRequestBuilders.get("/user/no-relations")
-            .param("username", userNameVictor)
-            .param("app-id", "1")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.name")
-            .value(Matchers.is(userNameVictor)))
-        .andDo(MockMvcResultHandlers.print());
+                    .param("username", userNameVictor)
+                    .param("app-id", "1")
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.name")
+                    .value(Matchers.is(userNameVictor)))
+            .andDo(MockMvcResultHandlers.print());
   }
 }

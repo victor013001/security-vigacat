@@ -11,4 +11,5 @@ public interface UserService {
     UserDto getUserWithoutFetch(String username, Long appId);
 
     Optional<UsernamePasswordDto> getUserByUsername(String username);
+
 }

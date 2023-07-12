@@ -5,7 +5,6 @@ import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,11 +14,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
+    private static final String LOG_PREFIX = "User Service >>";
+
     private final UserPersistence userPersistence;
 
     @Override
     public UserDto getUser(String username, Long appId) {
-        log.info("User Service >> Get User with name {} and app Id {}", username, appId);
+        log.info("{} Get User with name {} and app Id {}",LOG_PREFIX, username, appId);
         return userPersistence.getUserByUsernameAndApp(username, appId);
     }
 
