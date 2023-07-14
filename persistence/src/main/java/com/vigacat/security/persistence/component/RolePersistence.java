@@ -8,6 +8,8 @@ public interface RolePersistence {
 
     Optional<RoleDto> getRoleByNameAndAppId(String roleName, Long appId);
 
-    RoleDto saveNewRole(RoleDto roleDto, String usernameToken, Long appId);
+    RoleDto saveNewRole(RoleDto roleDto, Long appId);
+
+    boolean roleNameExist(String roleName, Long appId);
 
 }

@@ -74,7 +74,7 @@ public class RoleControllerTest {
 
         String roleUserDtoJson = new ObjectMapper().writeValueAsString(roleUserDto);
 
-        Mockito.when(roleService.createNewRole(roleNameUserDto, rolePermissionsDto, adminAuthorization, appId))
+        Mockito.when(roleService.createNewRole(roleNameUserDto, rolePermissionsDto, appId))
                 .thenReturn(roleUserDto);
 
         final String roleUserDtoResponse = mockMvc.perform(MockMvcRequestBuilders.post("/role")

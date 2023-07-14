@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface RoleService {
 
-    RoleDto createNewRole(String roleNameDto, List<String> rolePermissionsDto, String authorization, Long appId);
+    RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId);
 
 }

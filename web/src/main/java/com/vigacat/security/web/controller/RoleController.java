@@ -16,10 +16,9 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('permission::SEC_CREATE_ROLES')")
-    public RoleDto createNewRole(@RequestHeader("Authorization") String authorization,
-                                 @RequestHeader("app_id") Long appId,
+    public RoleDto createNewRole(@RequestHeader("app_id") Long appId,
                                  @RequestBody RoleRequest roleRequest) {
 
-        return roleService.createNewRole(roleRequest.getName(), roleRequest.getPermissions(), authorization, appId);
+        return roleService.createNewRole(roleRequest.getName(), roleRequest.getPermissions(), appId);
     }
 }
