@@ -49,14 +49,14 @@ public class PermissionPersistenceImplTest {
                 .thenReturn(permissionList);
 
         Mockito.when(modelMapper.map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class)))
-                .thenReturn(permissionDtoList.get(0),permissionDtoList.get(1));
+                .thenReturn(permissionDtoList.get(0), permissionDtoList.get(1));
 
         final List<PermissionDto> permissionDtoResponseList = permissionPersistence.getPermissionsByRoleIds(roleIds);
 
         Mockito.verify(permissionRepository)
                 .findPermissionsByRoleId(roleIds);
 
-        Mockito.verify(modelMapper,Mockito.times(2))
+        Mockito.verify(modelMapper, Mockito.times(2))
                 .map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class));
 
         Assertions.assertThat(permissionDtoResponseList)
@@ -66,7 +66,7 @@ public class PermissionPersistenceImplTest {
                         "Create"
                 );
     }
-
+    
     @Test
     public void getPermissionsByNames() {
 
@@ -95,14 +95,14 @@ public class PermissionPersistenceImplTest {
                 .thenReturn(permissionList);
 
         Mockito.when(modelMapper.map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class)))
-                .thenReturn(permissionDtoList.get(0),permissionDtoList.get(1));
+                .thenReturn(permissionDtoList.get(0), permissionDtoList.get(1));
 
         final List<PermissionDto> permissionsDtoResponse = permissionPersistence.getPermissionsByNames(permissionNames);
 
         Mockito.verify(permissionRepository)
                 .getPermissionsByName(permissionNames);
 
-        Mockito.verify(modelMapper,Mockito.times(2))
+        Mockito.verify(modelMapper, Mockito.times(2))
                 .map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class));
 
         Assertions.assertThat(permissionsDtoResponse)
@@ -112,5 +112,4 @@ public class PermissionPersistenceImplTest {
                         "Create"
                 );
     }
-
 }
