@@ -45,7 +45,7 @@ public class PermissionServiceImplTest {
         Mockito.when(permissionPersistence.getPermissionsByNames(permissionNames))
                 .thenReturn(permissionDtos);
 
-        final List<PermissionDto> permissionDtoResponse = permissionService.getPermissionsByName(permissionNames);
+        final List<PermissionDto> permissionDtoResponse = permissionService.getPermissionsByNames(permissionNames);
 
         Mockito.verify(permissionPersistence)
                 .getPermissionsByNames(permissionNames);

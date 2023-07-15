@@ -18,7 +18,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionPersistence permissionPersistence;
 
     @Override
-    public List<PermissionDto> getPermissionsByName(List<String> permissionNames) {
+    public List<PermissionDto> getPermissionsByNames(List<String> permissionNames) {
         log.info("{} Get permissions by list of names", LOG_PREFIX);
         return permissionPersistence.getPermissionsByNames(permissionNames);
     }

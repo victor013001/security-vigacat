@@ -52,7 +52,7 @@ public class RoleServiceImpl implements RoleService {
 
     private List<PermissionDto> getExistingRolePermissions(String roleName, List<String> rolePermissionNames, Long appId) {
 
-        List<PermissionDto> rolePermissionDtos = permissionService.getPermissionsByName(rolePermissionNames);
+        List<PermissionDto> rolePermissionDtos = permissionService.getPermissionsByNames(rolePermissionNames);
 
         if (rolePermissionNames.size() != rolePermissionDtos.size()) {
             throw new RoleCreateException("One or more permission doesn't exist", roleName, appId, RoleCreateException.Type.NON_EXISTENT_PERMISSIONS);

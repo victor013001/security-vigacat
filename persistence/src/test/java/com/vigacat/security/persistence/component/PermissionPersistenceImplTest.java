@@ -91,7 +91,7 @@ public class PermissionPersistenceImplTest {
                 createPermissionDto
         );
 
-        Mockito.when(permissionRepository.getPermissionsByName(permissionNames))
+        Mockito.when(permissionRepository.getPermissionsByNames(permissionNames))
                 .thenReturn(permissionList);
 
         Mockito.when(modelMapper.map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class)))
@@ -100,7 +100,7 @@ public class PermissionPersistenceImplTest {
         final List<PermissionDto> permissionsDtoResponse = permissionPersistence.getPermissionsByNames(permissionNames);
 
         Mockito.verify(permissionRepository)
-                .getPermissionsByName(permissionNames);
+                .getPermissionsByNames(permissionNames);
 
         Mockito.verify(modelMapper, Mockito.times(2))
                 .map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class));

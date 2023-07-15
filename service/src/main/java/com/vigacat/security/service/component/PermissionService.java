@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface PermissionService {
 
-    List<PermissionDto> getPermissionsByName (List<String> permissionNames);
+    List<PermissionDto> getPermissionsByNames(List<String> permissionNames);
 }

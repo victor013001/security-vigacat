@@ -18,6 +18,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     @Query(value = "SELECT DISTINCT p " +
             "FROM Permission p " +
             "WHERE p.permission IN :permissions")
-    List<Permission> getPermissionsByName(@Param("permissions") List<String> permissions);
+    List<Permission> getPermissionsByNames(@Param("permissions") List<String> permissions);
 
 }
