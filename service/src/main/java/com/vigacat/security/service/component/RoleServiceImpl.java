@@ -6,9 +6,7 @@ import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.service.exceptions.RoleCreateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -25,8 +23,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId) {
 
-        hasNullParameters(roleName, rolePermissionNames, appId);
-
         checkRoleNameUnique(roleName, appId);
 
         List<PermissionDto> rolePermissionsDto = getExistingRolePermissions(roleName, rolePermissionNames, appId);
@@ -36,12 +32,6 @@ public class RoleServiceImpl implements RoleService {
         log.info("{} Save role with name {} and app id {}", LOG_PREFIX, roleName, appId);
 
         return rolePersistence.saveNewRole(roleDto, appId);
-    }
-
-    private void hasNullParameters(String roleName, List<String> rolePermissionNames, Long appId) {
-        if (StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(rolePermissionNames)) {
-            throw new RoleCreateException("All parameters are required", roleName, appId, RoleCreateException.Type.INVALID_PARAMETERS);
-        }
     }
 
     private void checkRoleNameUnique(String roleName, Long appId) {

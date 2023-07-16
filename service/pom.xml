@@ -19,6 +19,7 @@
     </properties>
 
     <dependencies>
+        <!-- INTERNAL -->
         <dependency>
             <groupId>com.vigacat.security.persistence</groupId>
             <artifactId>persistence</artifactId>
