@@ -8,6 +8,6 @@ public interface RoleService {
 
     RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId);
 
-    List<RoleDto> getRolesByIds(List<Long> roleIds);
+    boolean roleIdsExist(List<Long> roleIds);
 
 }

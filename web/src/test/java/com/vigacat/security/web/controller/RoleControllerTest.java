@@ -5,6 +5,7 @@ import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.service.component.RoleService;
 import com.vigacat.security.web.dto.RoleRequest;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,8 +83,8 @@ public class RoleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(roleNameUser))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[0].permission").value(permissionRead))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[1].permission").value(permissionCreate))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[0].permission").value(Matchers.is(permissionRead)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[1].permission").value(Matchers.is(permissionCreate)))
                 .andDo(MockMvcResultHandlers.print());
     }
 

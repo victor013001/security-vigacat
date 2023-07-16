@@ -3,6 +3,7 @@ package com.vigacat.security.web.controller;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.service.component.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +32,8 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('permission::SEC_CREATE_USERS')")
-    public UserDto createNewUser (@RequestHeader("Authorization") String authorization,
-                                  @RequestBody UserToSaveDto userRequest) {
-        return userService.createNewUser(userRequest,authorization);
+    public UserDto createNewUser (@Valid @RequestBody UserToSaveDto userRequest) {
+        return userService.createNewUser(userRequest);
     }
 
 }

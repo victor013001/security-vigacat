@@ -86,26 +86,16 @@ public class RoleServiceImplTest {
 
         List<Long> roleIds = List.of(1L, 2L);
 
-        List<RoleDto> roleDtos = List.of(
-                RoleDto.builder()
-                        .id(1L)
-                        .build(),
-                RoleDto.builder()
-                        .id(2L)
-                        .build()
-        );
+        Mockito.when(rolePersistence.roleIdsExist(roleIds))
+                .thenReturn(true);
 
-        Mockito.when(rolePersistence.getRolesById(roleIds))
-                .thenReturn(roleDtos);
-
-        final List<RoleDto> roleDtosResponse = roleService.getRolesByIds(roleIds);
+        final boolean roleIdsExistResponse = roleService.roleIdsExist(roleIds);
 
         Mockito.verify(rolePersistence)
-                .getRolesById(roleIds);
+                .roleIdsExist(roleIds);
 
-        Assertions.assertThat(roleDtosResponse)
-                .extracting(RoleDto::getId)
-                .contains(1L, 2L);
+        Assertions.assertThat(roleIdsExistResponse)
+                .isTrue();
     }
 
 }

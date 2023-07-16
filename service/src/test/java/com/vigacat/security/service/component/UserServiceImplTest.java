@@ -1,14 +1,17 @@
 package com.vigacat.security.service.component;
 
 import com.vigacat.security.persistence.component.UserPersistence;
-import com.vigacat.security.persistence.dto.*;
-import com.vigacat.security.service.component.security.TokenService;
+import com.vigacat.security.persistence.dto.RoleDto;
+import com.vigacat.security.persistence.dto.UserDto;
+import com.vigacat.security.persistence.dto.UserToSaveDto;
+import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -20,10 +23,8 @@ public class UserServiceImplTest {
 
     @Mock
     private RoleService roleService;
-    @Mock
+    @Spy
     private PasswordEncoder passwordEncoder;
-    @Mock
-    private TokenService tokenService;
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
@@ -77,10 +78,6 @@ public class UserServiceImplTest {
         String username = "user";
         String userEmail = "user@email.com";
         String userPassword = "password";
-        String userPasswordEncoded = "$2a$10$Ne7NBZi5AH6zZaAanNI.m.EycvsXq.B/scmHvNllz4NNSX9wvGPke";
-        String tokenAdmin = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
-        String tokenUserNameAdmin = "Admin";
-
 
         List<RoleDto> userRolesDtos = List.of(
                 RoleDto.builder()
@@ -98,63 +95,36 @@ public class UserServiceImplTest {
                 .roles(userRolesDtos)
                 .build();
 
-        List<UserDto> emptyList = List.of();
-
-        List<Long> roleIds = List.of(1L, 2L);
-
-        List<RoleDto> roleDtos = List.of(
-                RoleDto.builder()
-                        .id(1L)
-                        .build(),
-                RoleDto.builder()
-                        .id(2L)
-                        .build()
-        );
-
-        TokenDto tokenAdminDto = TokenDto.builder()
-                .token(tokenAdmin)
-                .username(tokenUserNameAdmin)
-                .build();
-
         UserDto userDto = UserDto.builder()
                 .name(username)
                 .email(userEmail)
                 .roles(userRolesDtos)
                 .build();
 
-        Mockito.when(userPersistence.getUsersByNameOrEmail(username, userEmail))
-                .thenReturn(emptyList);
+        Mockito.when(userPersistence.userNameOrEmailExist(username, userEmail))
+                .thenReturn(false);
 
-        Mockito.when(roleService.getRolesByIds(roleIds))
-                .thenReturn(roleDtos);
+        Mockito.when(roleService.roleIdsExist(Mockito.anyList()))
+                .thenReturn(true);
 
-        Mockito.when(passwordEncoder.encode(userPassword))
-                .thenReturn(userPasswordEncoded);
-
-        Mockito.when(tokenService.getValidToken(tokenAdmin))
-                .thenReturn(tokenAdminDto);
-
-        Mockito.when(userPersistence.saveNewUser(userToSaveDto, tokenUserNameAdmin))
+        Mockito.when(userPersistence.saveNewUser(userToSaveDto))
                 .thenReturn(userDto);
 
-        final UserDto userDtoResponse = userService.createNewUser(userToSaveDto, tokenAdmin);
+        final UserDto userDtoResponse = userService.createNewUser(userToSaveDto);
 
         Mockito.verify(userPersistence)
-                .getUsersByNameOrEmail(username, userEmail);
+                .userNameOrEmailExist(username, userEmail);
 
         Mockito.verify(roleService)
-                .getRolesByIds(roleIds);
-
-        Mockito.verify(passwordEncoder)
-                .encode(userPassword);
-
-        Mockito.verify(tokenService)
-                .getValidToken(tokenAdmin);
+                .roleIdsExist(Mockito.anyList());
 
         Assertions.assertThat(userDtoResponse)
                 .hasFieldOrPropertyWithValue("name", username)
-                .hasFieldOrPropertyWithValue("email", userEmail)
-                .hasFieldOrPropertyWithValue("roles", roleDtos);
+                .hasFieldOrPropertyWithValue("email", userEmail);
+
+        Assertions.assertThat(userDtoResponse.getRoles())
+                .extracting(RoleDto::getId)
+                .contains(1L, 2L);
     }
 
     @Test

@@ -5,14 +5,12 @@ import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
-import com.vigacat.security.service.component.security.TokenService;
+import com.vigacat.security.service.exceptions.UserCreateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +25,6 @@ public class UserServiceImpl implements UserService {
     private final UserPersistence userPersistence;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
 
     @Override
     public UserDto getUser(String username, Long appId) {
@@ -46,31 +43,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createNewUser(UserToSaveDto userDto, String authorization) {
+    public UserDto createNewUser(UserToSaveDto userToSaveDto) {
 
-        String username = userDto.getName();
-        String userEmail = userDto.getEmail();
-        String userPassword = userDto.getPassword();
-        List<Long> roleIds = userDto.getRoles().stream()
+        String username = userToSaveDto.getName();
+        String userEmail = userToSaveDto.getEmail();
+
+        checkNameAndEmailUnique(username,userEmail);
+        checkExistingRoles(userToSaveDto.getRoles(), username,userEmail);
+        encodePassword(userToSaveDto);
+
+        log.info("{} Save user with name {} and email {}", LOG_PREFIX, username, userEmail);
+        return userPersistence.saveNewUser(userToSaveDto);
+    }
+
+    private void checkNameAndEmailUnique(String username, String userEmail) {
+        if (userPersistence.userNameOrEmailExist(username,userEmail)) {
+            throw new UserCreateException("Name or email already exist",username,userEmail, UserCreateException.Type.DUPLICATE_NAME_EMAIL);
+        }
+    }
+    
+    private void checkExistingRoles(List<RoleDto> roleDtos, String username, String userEmail) {
+        List<Long> roleIds = roleDtos.stream()
                 .map(RoleDto::getId)
                 .collect(Collectors.toList());
 
-        if (username.isEmpty() || userEmail.isEmpty() || userPassword.isEmpty() || roleIds.isEmpty()) {
-            throw new InvalidParameterException("All parameters are required");
+        if (!roleService.roleIdsExist(roleIds)) {
+            throw new UserCreateException("One or more roles doesn't exist",username,userEmail, UserCreateException.Type.NON_EXISTING_ROLES);
         }
+    }
 
-        if (!userPersistence.getUsersByNameOrEmail(username, userEmail).isEmpty()) {
-            throw new DuplicateKeyException("Name or email already exist");
-        }
-
-        roleService.getRolesByIds(roleIds);
-
-        userDto.setPassword(passwordEncoder.encode(userPassword));
-
-        String usernameToken = tokenService.getValidToken(authorization).getUsername();
-
-        log.info("{} Save user with name {} and email {}, created by {}", LOG_PREFIX, username, userEmail, usernameToken);
-        return userPersistence.saveNewUser(userDto, usernameToken);
+    private void encodePassword(UserToSaveDto userToSaveDto) {
+        userToSaveDto.setPassword(passwordEncoder.encode(userToSaveDto.getPassword()));
     }
 
 }

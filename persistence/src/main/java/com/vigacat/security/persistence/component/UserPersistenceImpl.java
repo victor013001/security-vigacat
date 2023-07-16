@@ -7,13 +7,12 @@ import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -47,21 +46,25 @@ public class UserPersistenceImpl implements UserPersistence {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDto> getUsersByNameOrEmail(String username, String email) {
-        return userRepository.findUsersByNameOrEmail(username, email).stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .collect(Collectors.toList());
+    public boolean userNameOrEmailExist(String username, String email) {
+        return userRepository.existsUsersByNameOrEmail(username, email);
     }
 
     @Override
-    public UserDto saveNewUser(UserToSaveDto userDto, String usernameToken) {
-
-        User userToSave = modelMapper.map(userDto, User.class);
-        userToSave.setCreatedBy(usernameToken);
-        userToSave.setCreatedAt(LocalDateTime.now());
-
+    public UserDto saveNewUser(UserToSaveDto userToSaveDto) {
+        User userToSave = createUserToSave(userToSaveDto);
         return modelMapper.map(userRepository.save(userToSave), UserDto.class);
     }
 
+    private User createUserToSave(UserToSaveDto userToSaveDto) {
+        User userToSave = modelMapper.map(userToSaveDto, User.class);
+
+        String usernameAuthenticated = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        userToSave.setCreatedBy(usernameAuthenticated);
+        userToSave.setCreatedAt(LocalDateTime.now());
+
+        return userToSave;
+    }
 
 }

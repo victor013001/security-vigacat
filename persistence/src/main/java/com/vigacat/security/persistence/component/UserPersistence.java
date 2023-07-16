@@ -4,7 +4,6 @@ import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserPersistence {
@@ -14,7 +13,7 @@ public interface UserPersistence {
 
     Optional<UsernamePasswordDto> getUserByUsername(String username);
 
-    List<UserDto> getUsersByNameOrEmail(String username, String email);
+    boolean userNameOrEmailExist(String username, String email);
 
-    UserDto saveNewUser(UserToSaveDto userDto, String usernameToken);
+    UserDto saveNewUser(UserToSaveDto userToSaveDto);
 }

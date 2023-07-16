@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
-import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RolePersistenceImplTest {
@@ -80,11 +79,11 @@ public class RolePersistenceImplTest {
 
         Role roleAdmin = modelMapper.map(roleAdminDto, Role.class);
 
-        Mockito.when(authentication.getName())
-                .thenReturn(usernameAdminAuthenticated);
-
         Mockito.when(securityContext.getAuthentication())
                 .thenReturn(authentication);
+
+        Mockito.when(authentication.getName())
+                .thenReturn(usernameAdminAuthenticated);
 
         Mockito.when(appRepository.getReferenceById(appId))
                 .thenReturn(appReference);
@@ -95,6 +94,12 @@ public class RolePersistenceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(roleAdminDto, 1L);
+
+        Mockito.verify(securityContext)
+                .getAuthentication();
+
+        Mockito.verify(authentication)
+                .getName();
 
         Mockito.verify(roleRepository)
                 .save(Mockito.any(Role.class));
@@ -112,42 +117,16 @@ public class RolePersistenceImplTest {
 
         List<Long> roleIds = List.of(1L, 2L);
 
-        List<Role> roles = List.of(
-                Role.builder()
-                        .id(1L)
-                        .build(),
-                Role.builder()
-                        .id(2L)
-                        .build()
-        );
+        Mockito.when(roleRepository.existsByIdIn(roleIds, roleIds.size()))
+                .thenReturn(true);
 
-        List<RoleDto> roleDtos = List.of(
-                RoleDto.builder()
-                        .id(1L)
-                        .build(),
-                RoleDto.builder()
-                        .id(2L)
-                        .build()
-        );
-
-
-        Mockito.when(roleRepository.findRolesByIdIn(roleIds))
-                .thenReturn(roles);
-
-        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
-                .thenReturn(roleDtos.get(0), roleDtos.get(1));
-
-        final List<RoleDto> roleDtosResponse = rolePersistence.getRolesById(roleIds);
+        final boolean roleIdsExistResponse = rolePersistence.roleIdsExist(roleIds);
 
         Mockito.verify(roleRepository)
-                .findRolesByIdIn(roleIds);
+                .existsByIdIn(roleIds, roleIds.size());
 
-        Mockito.verify(modelMapper, Mockito.times(2))
-                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
-
-        Assertions.assertThat(roleDtosResponse)
-                .extracting(RoleDto::getId)
-                .contains(1L, 2L);
+        Assertions.assertThat(roleIdsExistResponse)
+                .isTrue();
     }
 
 }

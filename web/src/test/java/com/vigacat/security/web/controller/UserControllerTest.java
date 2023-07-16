@@ -5,7 +5,6 @@ import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.service.component.UserService;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,8 +95,6 @@ public class UserControllerTest {
         String username = "user";
         String userEmail = "user@email.com";
         String userPassword = "password";
-        String tokenAdmin = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
-
 
         List<RoleDto> userRolesDtos = List.of(
                 RoleDto.builder()
@@ -122,22 +119,19 @@ public class UserControllerTest {
                 .build();
 
         String userToSaveJson = new ObjectMapper().writeValueAsString(userToSaveDto);
-        String userDtoJson = new ObjectMapper().writeValueAsString(userDto);
 
-        Mockito.when(userService.createNewUser(userToSaveDto, tokenAdmin))
+        Mockito.when(userService.createNewUser(userToSaveDto))
                 .thenReturn(userDto);
 
-        final String userDtoResponse = mockMvc.perform(MockMvcRequestBuilders.post("/user")
-                        .header("Authorization", tokenAdmin)
+        mockMvc.perform(MockMvcRequestBuilders.post("/user")
                         .content(userToSaveJson)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Assertions.assertThat(userDtoResponse)
-                .isEqualTo(userDtoJson);
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(username)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(Matchers.is(userEmail)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[1].id").value(2L))
+                .andDo(MockMvcResultHandlers.print());
     }
 
 }

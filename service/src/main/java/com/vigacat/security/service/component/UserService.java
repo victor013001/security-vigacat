@@ -13,6 +13,6 @@ public interface UserService {
 
     Optional<UsernamePasswordDto> getUserByUsername(String username);
 
-    UserDto createNewUser(UserToSaveDto userDto, String authorization);
+    UserDto createNewUser(UserToSaveDto userToSaveDto);
 
 }

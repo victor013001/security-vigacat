@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -51,10 +50,8 @@ public class RolePersistenceImpl implements RolePersistence {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RoleDto> getRolesById(List<Long> roleIds) {
-        return roleRepository.findRolesByIdIn(roleIds).stream()
-                .map(role -> modelMapper.map(role, RoleDto.class))
-                .collect(Collectors.toList());
+    public boolean roleIdsExist(List<Long> roleIds) {
+        return roleRepository.existsByIdIn(roleIds, roleIds.size());
     }
 
 }

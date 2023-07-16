@@ -10,6 +10,6 @@ public interface RolePersistence {
 
     boolean roleNameExist(String roleName, Long appId);
 
-    List<RoleDto> getRolesById(List<Long> roleIds);
+    boolean roleIdsExist(List<Long> roleIds);
 
 }

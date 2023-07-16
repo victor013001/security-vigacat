@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 @Service
@@ -35,20 +34,6 @@ public class RoleServiceImpl implements RoleService {
         return rolePersistence.saveNewRole(roleDto, appId);
     }
 
-    @Override
-    public List<RoleDto> getRolesByIds(List<Long> roleIds) {
-
-        log.info("{} Get roles by ids", LOG_PREFIX);
-
-        List<RoleDto> roleDtos = rolePersistence.getRolesById(roleIds);
-
-        if (roleIds.size() != roleDtos.size()) {
-            throw new InvalidParameterException("Roles doesn't exist");
-        }
-
-        return roleDtos;
-    }
-
     private void checkRoleNameUnique(String roleName, Long appId) {
         if (rolePersistence.roleNameExist(roleName, appId)) {
             throw new RoleCreateException("Role name already exists in the app", roleName, appId, RoleCreateException.Type.DUPLICATE_NAME);
@@ -71,6 +56,12 @@ public class RoleServiceImpl implements RoleService {
                 .name(roleName)
                 .permissions(rolePermissionsDto)
                 .build();
+    }
+
+    @Override
+    public boolean roleIdsExist(List<Long> roleIds) {
+        log.info("{} Check roles by ids", LOG_PREFIX);
+        return rolePersistence.roleIdsExist(roleIds);
     }
 
 }
