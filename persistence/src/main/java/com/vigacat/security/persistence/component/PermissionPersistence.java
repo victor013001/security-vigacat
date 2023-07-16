@@ -8,4 +8,5 @@ public interface PermissionPersistence {
     List<PermissionDto> getPermissionsByRoleIds(List<Long> roleIds);
 
     List<PermissionDto> getPermissionsByNames(List<String> permissionNames);
+
 }

@@ -28,7 +28,7 @@ public class PermissionPersistenceImpl implements PermissionPersistence {
     @Override
     @Transactional(readOnly = true)
     public List<PermissionDto> getPermissionsByNames(List<String> permissionNames) {
-        return permissionRepository.getPermissionsByName(permissionNames).stream()
+        return permissionRepository.getPermissionsByNames(permissionNames).stream()
                 .map(permission -> modelMapper.map(permission, PermissionDto.class))
                 .collect(Collectors.toList());
     }

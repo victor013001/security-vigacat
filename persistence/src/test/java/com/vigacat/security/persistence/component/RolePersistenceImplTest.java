@@ -1,7 +1,10 @@
 package com.vigacat.security.persistence.component;
 
+import com.vigacat.security.dao.entity.App;
 import com.vigacat.security.dao.entity.Role;
+import com.vigacat.security.dao.repository.AppRepository;
 import com.vigacat.security.dao.repository.RoleRepository;
+import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -9,8 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,78 +27,84 @@ public class RolePersistenceImplTest {
 
     @InjectMocks
     private RolePersistenceImpl rolePersistence;
-
     @Mock
     private RoleRepository roleRepository;
     @Mock
+    private AppRepository appRepository;
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private Authentication authentication;
+    @Spy
     private ModelMapper modelMapper;
 
-
     @Test
-    public void getRoleByNameAndAppId() {
+    public void roleNameExist() {
 
-        String roleAdminName = "Admin";
+        String roleNameAdmin = "Admin";
         Long appId = 1L;
 
-        Role adminRole = Role.builder()
-                .name(roleAdminName)
-                .build();
+        Mockito.when(roleRepository.existsRoleByNameAndAppId(roleNameAdmin, appId))
+                .thenReturn(true);
 
-        RoleDto adminRoleDto = RoleDto.builder()
-                .name(roleAdminName)
-                .build();
+        final boolean roleNameAdminExist = rolePersistence.roleNameExist(roleNameAdmin, appId);
 
-        Mockito.when(roleRepository.findByNameAndAppId(roleAdminName, appId))
-                .thenReturn(Optional.of(adminRole));
-
-        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
-                .thenReturn(adminRoleDto);
-
-        final Optional<RoleDto> adminRoleDtoResponse = rolePersistence.getRoleByNameAndAppId(roleAdminName, appId);
-
-        Mockito.verify(roleRepository)
-                .findByNameAndAppId(roleAdminName, appId);
-
-        Mockito.verify(modelMapper)
-                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
-
-        Assertions.assertThat(adminRoleDtoResponse)
-                .contains(adminRoleDto);
+        Assertions.assertThat(roleNameAdminExist)
+                .isTrue();
     }
+
 
     @Test
     public void saveNewRole() {
 
-        String roleAdminName = "Admin";
-        String usernameAdmin = "userAdmin";
+        String roleNameUser = "User";
+        String usernameAdminAuthenticated = "userAdmin";
+        String permissionNameRead = "Read";
 
-        Role adminRole = Role.builder()
-                .name(roleAdminName)
+        Long appId = 1L;
+
+        PermissionDto permissionDtoRead = PermissionDto.builder()
+                .permission(permissionNameRead)
                 .build();
 
-        RoleDto adminRoleDto = RoleDto.builder()
-                .name(roleAdminName)
+        List<PermissionDto> rolePermissionDtos = List.of(permissionDtoRead);
+
+        RoleDto roleAdminDto = RoleDto.builder()
+                .name(roleNameUser)
+                .permissions(rolePermissionDtos)
                 .build();
 
-        Mockito.when(modelMapper.map(Mockito.any(RoleDto.class), Mockito.eq(Role.class)))
-                .thenReturn(adminRole);
+        App appReference = App.builder()
+                .id(appId)
+                .build();
 
-        Mockito.when(roleRepository.save(adminRole))
-                .thenReturn(adminRole);
+        Role roleAdmin = modelMapper.map(roleAdminDto, Role.class);
 
-        Mockito.when(modelMapper.map(Mockito.any(Role.class), Mockito.eq(RoleDto.class)))
-                .thenReturn(adminRoleDto);
+        Mockito.when(authentication.getName())
+                .thenReturn(usernameAdminAuthenticated);
 
-        final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(adminRoleDto, usernameAdmin, 1L);
+        Mockito.when(securityContext.getAuthentication())
+                .thenReturn(authentication);
 
-        Mockito.verify(modelMapper)
-                .map(Mockito.any(RoleDto.class), Mockito.eq(Role.class));
+        Mockito.when(appRepository.getReferenceById(appId))
+                .thenReturn(appReference);
 
-        Mockito.verify(modelMapper)
-                .map(Mockito.any(Role.class), Mockito.eq(RoleDto.class));
+        Mockito.when(roleRepository.save(Mockito.any(Role.class)))
+                .thenReturn(roleAdmin);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(roleAdminDto, 1L);
+
+        Mockito.verify(roleRepository)
+                .save(Mockito.any(Role.class));
 
         Assertions.assertThat(adminRoleDtoResponse)
-                .hasFieldOrPropertyWithValue("name", roleAdminName);
+                .hasFieldOrPropertyWithValue("name", roleNameUser);
+
+        Assertions.assertThat(adminRoleDtoResponse.getPermissions())
+                .extracting(PermissionDto::getPermission)
+                .contains(permissionNameRead);
     }
 
     @Test

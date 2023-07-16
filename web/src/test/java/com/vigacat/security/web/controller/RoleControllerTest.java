@@ -5,7 +5,6 @@ import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.service.component.RoleService;
 import com.vigacat.security.web.dto.RoleRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -40,26 +40,27 @@ public class RoleControllerTest {
     @Test
     public void createNewRole() throws Exception {
 
-        String roleNameUserDto = "User";
-        String adminAuthorization = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
+        String roleNameUser = "User";
+        String permissionRead = "Read";
+        String permissionCreate = "Create";
 
         Long appId = 1L;
 
-        List<String> rolePermissionsDto = List.of("Read", "Create");
+        List<String> roleUserPermissions = List.of(permissionRead, permissionCreate);
 
         RoleRequest roleUserRequest = RoleRequest.builder()
-                .permissions(rolePermissionsDto)
-                .name(roleNameUserDto)
+                .permissions(roleUserPermissions)
+                .name(roleNameUser)
                 .build();
 
-        String createRolUserRequest = new ObjectMapper().writeValueAsString(roleUserRequest);
+        String roleUserRequestJson = new ObjectMapper().writeValueAsString(roleUserRequest);
 
         PermissionDto permissionDtoCreate = PermissionDto.builder()
-                .permission("Create")
+                .permission(permissionRead)
                 .build();
 
         PermissionDto permissionDtoRead = PermissionDto.builder()
-                .permission("Read")
+                .permission(permissionCreate)
                 .build();
 
         List<PermissionDto> permissionDtos = List.of(
@@ -68,28 +69,22 @@ public class RoleControllerTest {
         );
 
         RoleDto roleUserDto = RoleDto.builder()
-                .name(roleNameUserDto)
+                .name(roleNameUser)
                 .permissions(permissionDtos)
                 .build();
 
-        String roleUserDtoJson = new ObjectMapper().writeValueAsString(roleUserDto);
-
-        Mockito.when(roleService.createNewRole(roleNameUserDto, rolePermissionsDto, adminAuthorization, appId))
+        Mockito.when(roleService.createNewRole(roleNameUser, roleUserPermissions, appId))
                 .thenReturn(roleUserDto);
 
-        final String roleUserDtoResponse = mockMvc.perform(MockMvcRequestBuilders.post("/role")
-                        .content(createRolUserRequest)
-                        .header("Authorization", adminAuthorization)
+        mockMvc.perform(MockMvcRequestBuilders.post("/role")
+                        .content(roleUserRequestJson)
                         .header("app_id", appId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        Assertions.assertThat(roleUserDtoResponse)
-                .isEqualTo(roleUserDtoJson);
-
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(roleNameUser))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[0].permission").value(permissionRead))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[1].permission").value(permissionCreate))
+                .andDo(MockMvcResultHandlers.print());
     }
 
 }

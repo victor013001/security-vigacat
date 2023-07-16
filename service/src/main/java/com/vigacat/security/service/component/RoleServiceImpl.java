@@ -3,10 +3,9 @@ package com.vigacat.security.service.component;
 import com.vigacat.security.persistence.component.RolePersistence;
 import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
-import com.vigacat.security.service.component.security.TokenService;
+import com.vigacat.security.service.exceptions.RoleCreateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
@@ -21,30 +20,19 @@ public class RoleServiceImpl implements RoleService {
 
     private final RolePersistence rolePersistence;
     private final PermissionService permissionService;
-    private final TokenService tokenService;
 
     @Override
-    public RoleDto createNewRole(String roleNameDto, List<String> rolePermissionNames, String authorization, Long appId) {
+    public RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId) {
 
-        if (roleNameDto.isEmpty() || rolePermissionNames.isEmpty()) {
-            throw new InvalidParameterException("All parameters are required");
-        }
+        checkRoleNameUnique(roleName, appId);
 
-        if (rolePersistence.getRoleByNameAndAppId(roleNameDto, appId).isPresent()) {
-            throw new DuplicateKeyException("Role already exist");
-        }
+        List<PermissionDto> rolePermissionsDto = getExistingRolePermissions(roleName, rolePermissionNames, appId);
 
-        List<PermissionDto> permissionsDto = permissionService.getPermissionsByName(rolePermissionNames);
+        RoleDto roleDto = createRoleDto(roleName, rolePermissionsDto);
 
-        String usernameToken = tokenService.getValidToken(authorization).getUsername();
+        log.info("{} Save role with name {} and app id {}", LOG_PREFIX, roleName, appId);
 
-        RoleDto roleDto = RoleDto.builder()
-                .name(roleNameDto)
-                .permissions(permissionsDto)
-                .build();
-
-        log.info("{} Save role with name {} and app id {}, created by {}", LOG_PREFIX, roleNameDto, appId, usernameToken);
-        return rolePersistence.saveNewRole(roleDto, usernameToken, appId);
+        return rolePersistence.saveNewRole(roleDto, appId);
     }
 
     @Override
@@ -60,4 +48,29 @@ public class RoleServiceImpl implements RoleService {
 
         return roleDtos;
     }
+
+    private void checkRoleNameUnique(String roleName, Long appId) {
+        if (rolePersistence.roleNameExist(roleName, appId)) {
+            throw new RoleCreateException("Role name already exists in the app", roleName, appId, RoleCreateException.Type.DUPLICATE_NAME);
+        }
+    }
+
+    private List<PermissionDto> getExistingRolePermissions(String roleName, List<String> rolePermissionNames, Long appId) {
+
+        List<PermissionDto> rolePermissionDtos = permissionService.getPermissionsByNames(rolePermissionNames);
+
+        if (rolePermissionNames.size() != rolePermissionDtos.size()) {
+            throw new RoleCreateException("One or more permission doesn't exist", roleName, appId, RoleCreateException.Type.NON_EXISTENT_PERMISSIONS);
+        }
+
+        return rolePermissionDtos;
+    }
+
+    private RoleDto createRoleDto(String roleName, List<PermissionDto> rolePermissionsDto) {
+        return RoleDto.builder()
+                .name(roleName)
+                .permissions(rolePermissionsDto)
+                .build();
+    }
+
 }
