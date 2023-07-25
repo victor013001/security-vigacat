@@ -6,7 +6,6 @@ import com.vigacat.security.dao.repository.RoleRepository;
 import com.vigacat.security.persistence.dto.RoleDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,23 +21,9 @@ public class RolePersistenceImpl implements RolePersistence {
 
     @Override
     @Transactional
-    public RoleDto saveNewRole(RoleDto roleDto, Long appId) {
-        Role roleToSave = createRole(roleDto, appId);
+    public RoleDto saveNewRole(RoleDto roleDto, Long appId, String usernameAuthenticated) {
+        Role roleToSave = createRole(roleDto, appId, usernameAuthenticated);
         return modelMapper.map(roleRepository.save(roleToSave), RoleDto.class);
-    }
-
-    private Role createRole(RoleDto roleDto, Long appId) {
-
-        String usernameAuthenticated = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Role role = modelMapper.map(roleDto, Role.class);
-
-        role.setApp(appRepository.getReferenceById(appId));
-
-        role.setCreatedBy(usernameAuthenticated);
-        role.setCreatedAt(LocalDateTime.now());
-
-        return role;
     }
 
     @Override
@@ -47,5 +32,12 @@ public class RolePersistenceImpl implements RolePersistence {
         return roleRepository.existsRoleByNameAndAppId(roleName, appId);
     }
 
+    private Role createRole(RoleDto roleDto, Long appId, String usernameAuthenticated) {
+        Role role = modelMapper.map(roleDto, Role.class);
+        role.setApp(appRepository.getReferenceById(appId));
+        role.setCreatedBy(usernameAuthenticated);
+        role.setCreatedAt(LocalDateTime.now());
+        return role;
+    }
 
 }

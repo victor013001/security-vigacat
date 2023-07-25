@@ -3,6 +3,7 @@ package com.vigacat.security.service.component;
 import com.vigacat.security.persistence.component.RolePersistence;
 import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
+import com.vigacat.security.service.component.security.util.VigacatSecurityContext;
 import com.vigacat.security.service.exceptions.RoleCreateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,35 +20,29 @@ public class RoleServiceImpl implements RoleService {
 
     private final RolePersistence rolePersistence;
     private final PermissionService permissionService;
+    private final VigacatSecurityContext vigacatSecurityContext;
 
     @Override
     public RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId) {
-
         checkRoleNameUnique(roleName, appId);
-
-        List<PermissionDto> rolePermissionsDto = getExistingRolePermissions(roleName, rolePermissionNames, appId);
-
+        List<PermissionDto> rolePermissionsDto = getExistingRolePermissions(rolePermissionNames, appId);
         RoleDto roleDto = createRoleDto(roleName, rolePermissionsDto);
-
-        log.info("{} Save role with name {} and app id {}", LOG_PREFIX, roleName, appId);
-
-        return rolePersistence.saveNewRole(roleDto, appId);
+        String usernameAuthenticated = vigacatSecurityContext.getUsernameAuthenticated();
+        log.info("{} Save role with name {} and app id {}, created by {}", LOG_PREFIX, roleName, appId, usernameAuthenticated);
+        return rolePersistence.saveNewRole(roleDto, appId, usernameAuthenticated);
     }
 
     private void checkRoleNameUnique(String roleName, Long appId) {
         if (rolePersistence.roleNameExist(roleName, appId)) {
-            throw new RoleCreateException("Role name already exists in the app", roleName, appId, RoleCreateException.Type.DUPLICATE_NAME);
+            throw new RoleCreateException(roleName, appId, RoleCreateException.Type.DUPLICATE_NAME);
         }
     }
 
-    private List<PermissionDto> getExistingRolePermissions(String roleName, List<String> rolePermissionNames, Long appId) {
-
+    private List<PermissionDto> getExistingRolePermissions(List<String> rolePermissionNames, Long appId) {
         List<PermissionDto> rolePermissionDtos = permissionService.getPermissionsByNames(rolePermissionNames);
-
         if (rolePermissionNames.size() != rolePermissionDtos.size()) {
-            throw new RoleCreateException("One or more permission doesn't exist", roleName, appId, RoleCreateException.Type.NON_EXISTENT_PERMISSIONS);
+            throw new RoleCreateException(rolePermissionNames, appId, RoleCreateException.Type.NON_EXISTENT_PERMISSIONS);
         }
-
         return rolePermissionDtos;
     }
 
@@ -57,6 +52,5 @@ public class RoleServiceImpl implements RoleService {
                 .permissions(rolePermissionsDto)
                 .build();
     }
-
 
 }
