@@ -1,12 +1,10 @@
-package com.vigacat.security.persistence.component;
+package com.vigacat.security.service.component;
 
 import com.vigacat.security.persistence.dto.PermissionDto;
 
 import java.util.List;
 
-public interface PermissionPersistence {
-    List<PermissionDto> getPermissionsByRoleIds(List<Long> roleIds);
+public interface PermissionService {
 
     List<PermissionDto> getPermissionsByNames(List<String> permissionNames);
-
 }

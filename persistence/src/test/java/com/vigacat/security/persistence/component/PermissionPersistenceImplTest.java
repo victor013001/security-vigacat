@@ -49,14 +49,14 @@ public class PermissionPersistenceImplTest {
                 .thenReturn(permissionList);
 
         Mockito.when(modelMapper.map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class)))
-                .thenReturn(permissionDtoList.get(0),permissionDtoList.get(1));
+                .thenReturn(permissionDtoList.get(0), permissionDtoList.get(1));
 
         final List<PermissionDto> permissionDtoResponseList = permissionPersistence.getPermissionsByRoleIds(roleIds);
 
         Mockito.verify(permissionRepository)
                 .findPermissionsByRoleId(roleIds);
 
-        Mockito.verify(modelMapper,Mockito.times(2))
+        Mockito.verify(modelMapper, Mockito.times(2))
                 .map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class));
 
         Assertions.assertThat(permissionDtoResponseList)
@@ -66,5 +66,50 @@ public class PermissionPersistenceImplTest {
                         "Create"
                 );
     }
+    
+    @Test
+    public void getPermissionsByNames() {
 
+        List<String> permissionNames = List.of(
+                "Read",
+                "Create"
+        );
+
+        Permission readPermission = Permission.builder().permission("Read").build();
+        PermissionDto readPermissionDto = PermissionDto.builder().permission("Read").build();
+
+        Permission createPermission = Permission.builder().permission("Create").build();
+        PermissionDto createPermissionDto = PermissionDto.builder().permission("Create").build();
+
+        List<Permission> permissionList = List.of(
+                readPermission,
+                createPermission
+        );
+
+        List<PermissionDto> permissionDtoList = List.of(
+                readPermissionDto,
+                createPermissionDto
+        );
+
+        Mockito.when(permissionRepository.getPermissionsByNames(permissionNames))
+                .thenReturn(permissionList);
+
+        Mockito.when(modelMapper.map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class)))
+                .thenReturn(permissionDtoList.get(0), permissionDtoList.get(1));
+
+        final List<PermissionDto> permissionsDtoResponse = permissionPersistence.getPermissionsByNames(permissionNames);
+
+        Mockito.verify(permissionRepository)
+                .getPermissionsByNames(permissionNames);
+
+        Mockito.verify(modelMapper, Mockito.times(2))
+                .map(Mockito.any(Permission.class), Mockito.eq(PermissionDto.class));
+
+        Assertions.assertThat(permissionsDtoResponse)
+                .extracting(PermissionDto::getPermission)
+                .contains(
+                        "Read",
+                        "Create"
+                );
+    }
 }

@@ -5,6 +5,7 @@ import com.vigacat.security.persistence.dto.PermissionDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +18,17 @@ public class PermissionPersistenceImpl implements PermissionPersistence {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<PermissionDto> getPermissionsByRoleIds(List<Long> roleIds) {
         return permissionRepository.findPermissionsByRoleId(roleIds).stream()
+                .map(permission -> modelMapper.map(permission, PermissionDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PermissionDto> getPermissionsByNames(List<String> permissionNames) {
+        return permissionRepository.getPermissionsByNames(permissionNames).stream()
                 .map(permission -> modelMapper.map(permission, PermissionDto.class))
                 .collect(Collectors.toList());
     }

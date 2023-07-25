@@ -34,6 +34,7 @@ public class UserPersistenceImpl implements UserPersistence {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UsernamePasswordDto> getUserByUsername(String username) {
         return userRepository.findByName(username)
                 .map(user -> modelMapper.map(user, UsernamePasswordDto.class));

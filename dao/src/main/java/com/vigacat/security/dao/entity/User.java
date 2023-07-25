@@ -7,14 +7,15 @@ import java.util.List;
 
 @Entity
 @Table(name = "user")
-@EqualsAndHashCode
+@EqualsAndHashCode (callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class User extends AuditedEntity {
 
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     @Id
     private Long id;
