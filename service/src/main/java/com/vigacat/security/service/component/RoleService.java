@@ -9,5 +9,4 @@ public interface RoleService {
     RoleDto createNewRole(String roleName, List<String> rolePermissionNames, Long appId);
 
     boolean roleIdsExist(List<Long> roleIds);
-
 }

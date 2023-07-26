@@ -19,7 +19,6 @@ public class RoleController {
     @PreAuthorize("hasAnyAuthority('permission::SEC_CREATE_ROLES')")
     public RoleDto createNewRole(@RequestHeader("app_id") Long appId,
                                  @Valid @RequestBody RoleRequest roleRequest) {
-
         return roleService.createNewRole(roleRequest.getName(), roleRequest.getPermissions(), appId);
     }
 }

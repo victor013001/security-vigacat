@@ -6,10 +6,9 @@ import java.util.List;
 
 public interface RolePersistence {
 
-    RoleDto saveNewRole(RoleDto roleDto, Long appId);
+    RoleDto saveNewRole(RoleDto roleDto, Long appId, String usernameAuthenticated);
 
     boolean roleNameExist(String roleName, Long appId);
 
     boolean roleIdsExist(List<Long> roleIds);
-
 }

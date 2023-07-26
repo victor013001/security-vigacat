@@ -3,6 +3,7 @@ package com.vigacat.security.service.component;
 import com.vigacat.security.persistence.component.RolePersistence;
 import com.vigacat.security.persistence.dto.PermissionDto;
 import com.vigacat.security.persistence.dto.RoleDto;
+import com.vigacat.security.service.component.security.util.VigacatSecurityContext;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,8 @@ public class RoleServiceImplTest {
     private RolePersistence rolePersistence;
     @Mock
     private PermissionService permissionService;
+    @Mock
+    private VigacatSecurityContext vigacatSecurityContext;
 
     @Test
     public void createNewRole() {
@@ -30,6 +33,7 @@ public class RoleServiceImplTest {
         String roleNameUser = "User";
         String permissionCreate = "Create";
         String permissionRead = "Read";
+        String usernameAdminAuthenticated = "userAdmin";
 
         Long appId = 1L;
 
@@ -62,8 +66,11 @@ public class RoleServiceImplTest {
         Mockito.when(permissionService.getPermissionsByNames(permissionNames))
                 .thenReturn(permissionDtos);
 
-        Mockito.when(rolePersistence.saveNewRole(roleDtoUser, appId))
+        Mockito.when(rolePersistence.saveNewRole(roleDtoUser, appId, usernameAdminAuthenticated))
                 .thenReturn(roleDtoUser);
+
+        Mockito.when(vigacatSecurityContext.getUsernameAuthenticated())
+                .thenReturn(usernameAdminAuthenticated);
 
         final RoleDto roleDtoUserResponse = roleService.createNewRole(roleNameUser, permissionNames, appId);
 

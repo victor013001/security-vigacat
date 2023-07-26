@@ -15,9 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
@@ -30,10 +27,7 @@ public class RolePersistenceImplTest {
     private RoleRepository roleRepository;
     @Mock
     private AppRepository appRepository;
-    @Mock
-    private SecurityContext securityContext;
-    @Mock
-    private Authentication authentication;
+
     @Spy
     private ModelMapper modelMapper;
 
@@ -79,27 +73,13 @@ public class RolePersistenceImplTest {
 
         Role roleAdmin = modelMapper.map(roleAdminDto, Role.class);
 
-        Mockito.when(securityContext.getAuthentication())
-                .thenReturn(authentication);
-
-        Mockito.when(authentication.getName())
-                .thenReturn(usernameAdminAuthenticated);
-
         Mockito.when(appRepository.getReferenceById(appId))
                 .thenReturn(appReference);
 
         Mockito.when(roleRepository.save(Mockito.any(Role.class)))
                 .thenReturn(roleAdmin);
 
-        SecurityContextHolder.setContext(securityContext);
-
-        final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(roleAdminDto, 1L);
-
-        Mockito.verify(securityContext)
-                .getAuthentication();
-
-        Mockito.verify(authentication)
-                .getName();
+        final RoleDto adminRoleDtoResponse = rolePersistence.saveNewRole(roleAdminDto, 1L, usernameAdminAuthenticated);
 
         Mockito.verify(roleRepository)
                 .save(Mockito.any(Role.class));
