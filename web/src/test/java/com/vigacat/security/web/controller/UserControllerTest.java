@@ -96,6 +96,7 @@ public class UserControllerTest {
         String userEmail = "user@email.com";
         String userPassword = "password";
 
+        List<Long> userRoleIds = List.of(1L,2L);
         List<RoleDto> userRolesDtos = List.of(
                 RoleDto.builder()
                         .id(1L)
@@ -109,7 +110,7 @@ public class UserControllerTest {
                 .name(username)
                 .email(userEmail)
                 .password(userPassword)
-                .roles(userRolesDtos)
+                .roleIds(userRoleIds)
                 .build();
 
         UserDto userDto = UserDto.builder()

@@ -2,7 +2,6 @@ package com.vigacat.security.persistence.component;
 
 import com.vigacat.security.dao.entity.User;
 import com.vigacat.security.dao.repository.UserRepository;
-import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import org.assertj.core.api.Assertions;
@@ -14,9 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +28,6 @@ public class UserPersistenceImplTest {
 
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private SecurityContext securityContext;
-    @Mock
-    private Authentication authentication;
-
 
     @Test
     public void getUserByUsernameAndApp() {
@@ -149,42 +140,21 @@ public class UserPersistenceImplTest {
         String userPasswordEncoded = "$2a$10$Ne7NBZi5AH6zZaAanNI.m.EycvsXq.B/scmHvNllz4NNSX9wvGPke";
         String usernameAdminAuthenticated = "Admin";
 
-        List<RoleDto> userRolesDtos = List.of(
-                RoleDto.builder()
-                        .id(1L)
-                        .build(),
-                RoleDto.builder()
-                        .id(2L)
-                        .build()
-        );
+        List<Long> userRoleIds = List.of(1L, 2L);
 
         UserToSaveDto userToSaveDto = UserToSaveDto.builder()
                 .name(username)
                 .email(userEmail)
                 .password(userPasswordEncoded)
-                .roles(userRolesDtos)
+                .roleIds(userRoleIds)
                 .build();
 
         User userToSave = modelMapper.map(userToSaveDto, User.class);
 
-        Mockito.when(securityContext.getAuthentication())
-                .thenReturn(authentication);
-
-        Mockito.when(authentication.getName())
-                .thenReturn(usernameAdminAuthenticated);
-
         Mockito.when(userRepository.save(Mockito.any(User.class)))
                 .thenReturn(userToSave);
 
-        SecurityContextHolder.setContext(securityContext);
-
-        final UserDto userDtoResponse = userPersistence.saveNewUser(userToSaveDto);
-
-        Mockito.verify(securityContext)
-                .getAuthentication();
-
-        Mockito.verify(authentication)
-                .getName();
+        final UserDto userDtoResponse = userPersistence.saveNewUser(userToSaveDto, usernameAdminAuthenticated);
 
         Mockito.verify(userRepository)
                 .save(Mockito.any(User.class));
@@ -192,10 +162,6 @@ public class UserPersistenceImplTest {
         Assertions.assertThat(userDtoResponse)
                 .hasFieldOrPropertyWithValue("name", username)
                 .hasFieldOrPropertyWithValue("email", userEmail);
-
-        Assertions.assertThat(userDtoResponse.getRoles())
-                .extracting(RoleDto::getId)
-                .contains(1L, 2L);
     }
 
 }

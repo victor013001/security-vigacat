@@ -1,7 +1,6 @@
 package com.vigacat.security.service.component;
 
 import com.vigacat.security.persistence.component.UserPersistence;
-import com.vigacat.security.persistence.dto.RoleDto;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
@@ -78,27 +77,20 @@ public class UserServiceImplTest {
         String username = "user";
         String userEmail = "user@email.com";
         String userPassword = "password";
+        String usernameAdminAuthenticated = "userAdmin";
 
-        List<RoleDto> userRolesDtos = List.of(
-                RoleDto.builder()
-                        .id(1L)
-                        .build(),
-                RoleDto.builder()
-                        .id(2L)
-                        .build()
-        );
+        List<Long> userRoleIds = List.of(1L, 2L);
 
         UserToSaveDto userToSaveDto = UserToSaveDto.builder()
                 .name(username)
                 .email(userEmail)
                 .password(userPassword)
-                .roles(userRolesDtos)
+                .roleIds(userRoleIds)
                 .build();
 
         UserDto userDto = UserDto.builder()
                 .name(username)
                 .email(userEmail)
-                .roles(userRolesDtos)
                 .build();
 
         Mockito.when(userPersistence.userNameOrEmailExist(username, userEmail))
@@ -107,7 +99,7 @@ public class UserServiceImplTest {
         Mockito.when(roleService.roleIdsExist(Mockito.anyList()))
                 .thenReturn(true);
 
-        Mockito.when(userPersistence.saveNewUser(userToSaveDto))
+        Mockito.when(userPersistence.saveNewUser(userToSaveDto, usernameAdminAuthenticated))
                 .thenReturn(userDto);
 
         final UserDto userDtoResponse = userService.createNewUser(userToSaveDto);
@@ -121,10 +113,6 @@ public class UserServiceImplTest {
         Assertions.assertThat(userDtoResponse)
                 .hasFieldOrPropertyWithValue("name", username)
                 .hasFieldOrPropertyWithValue("email", userEmail);
-
-        Assertions.assertThat(userDtoResponse.getRoles())
-                .extracting(RoleDto::getId)
-                .contains(1L, 2L);
     }
 
     @Test

@@ -1,24 +1,28 @@
 package com.vigacat.security.persistence.component;
 
+import com.vigacat.security.dao.entity.Role;
 import com.vigacat.security.dao.entity.User;
+import com.vigacat.security.dao.repository.RoleRepository;
 import com.vigacat.security.dao.repository.UserRepository;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.persistence.dto.UsernamePasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class UserPersistenceImpl implements UserPersistence {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -51,20 +55,24 @@ public class UserPersistenceImpl implements UserPersistence {
     }
 
     @Override
-    public UserDto saveNewUser(UserToSaveDto userToSaveDto) {
-        User userToSave = createUserToSave(userToSaveDto);
+    @Transactional
+    public UserDto saveNewUser(UserToSaveDto userToSaveDto, String usernameAuthenticated) {
+        User userToSave = createUserToSave(userToSaveDto, usernameAuthenticated);
         return modelMapper.map(userRepository.save(userToSave), UserDto.class);
     }
 
-    private User createUserToSave(UserToSaveDto userToSaveDto) {
+    private User createUserToSave(UserToSaveDto userToSaveDto, String usernameAuthenticated) {
         User userToSave = modelMapper.map(userToSaveDto, User.class);
-
-        String usernameAuthenticated = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        userToSave.setRoles(getRoleReferences(userToSaveDto.getRoleIds()));
         userToSave.setCreatedBy(usernameAuthenticated);
         userToSave.setCreatedAt(LocalDateTime.now());
-
         return userToSave;
+    }
+
+    private List<Role> getRoleReferences(List<Long> roleIds) {
+        return roleIds.stream()
+                .map(roleRepository::getReferenceById)
+                .collect(Collectors.toList());
     }
 
 }

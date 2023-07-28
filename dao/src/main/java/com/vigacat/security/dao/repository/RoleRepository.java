@@ -13,4 +13,6 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Query(value = "SELECT COUNT(r) = :roleIdsSize FROM Role r WHERE r.id IN (:roleIds)")
     boolean existsByIdIn(@Param("roleIds") List<Long> roleIds, @Param("roleIdsSize") int roleIdsSize);
+
+    Role getReferenceById(Long roleId);
 }

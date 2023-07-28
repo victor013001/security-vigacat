@@ -15,5 +15,5 @@ public interface UserPersistence {
 
     boolean userNameOrEmailExist(String username, String email);
 
-    UserDto saveNewUser(UserToSaveDto userToSaveDto);
+    UserDto saveNewUser(UserToSaveDto userToSaveDto, String usernameAuthenticated);
 }

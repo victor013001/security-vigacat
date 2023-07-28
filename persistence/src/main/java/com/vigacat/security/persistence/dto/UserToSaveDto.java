@@ -26,5 +26,5 @@ public class UserToSaveDto {
     private String password;
 
     @NotEmpty(message = "The list of roles is mandatory")
-    private List<RoleDto> roles;
+    private List<Long> roleIds;
 }
