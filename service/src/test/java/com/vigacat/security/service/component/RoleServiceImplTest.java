@@ -88,4 +88,21 @@ public class RoleServiceImplTest {
                 .contains(permissionCreate, permissionRead);
     }
 
+    @Test
+    public void getRolesByIds() {
+
+        List<Long> roleIds = List.of(1L, 2L);
+
+        Mockito.when(rolePersistence.roleIdsExist(roleIds))
+                .thenReturn(true);
+
+        final boolean roleIdsExistResponse = roleService.roleIdsExist(roleIds);
+
+        Mockito.verify(rolePersistence)
+                .roleIdsExist(roleIds);
+
+        Assertions.assertThat(roleIdsExistResponse)
+                .isTrue();
+    }
+
 }

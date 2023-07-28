@@ -1,13 +1,12 @@
 package com.vigacat.security.web.controller;
 
 import com.vigacat.security.persistence.dto.UserDto;
+import com.vigacat.security.persistence.dto.UserToSaveDto;
 import com.vigacat.security.service.component.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -29,6 +28,12 @@ public class UserController {
             @RequestParam(name = "username") String username,
             @RequestParam(name = "app-id") Long appId) {
         return userService.getUserWithoutFetch(username, appId);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyAuthority('permission::SEC_CREATE_USERS')")
+    public UserDto createNewUser (@Valid @RequestBody UserToSaveDto userRequest) {
+        return userService.createNewUser(userRequest);
     }
 
 }

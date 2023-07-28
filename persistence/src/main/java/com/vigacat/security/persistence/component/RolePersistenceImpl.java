@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +32,12 @@ public class RolePersistenceImpl implements RolePersistence {
     @Transactional(readOnly = true)
     public boolean roleNameExist(String roleName, Long appId) {
         return roleRepository.existsRoleByNameAndAppId(roleName, appId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean roleIdsExist(List<Long> roleIds) {
+        return roleRepository.existsByIdIn(roleIds, roleIds.size());
     }
 
     private Role createRole(RoleDto roleDto, Long appId, String usernameAuthenticated) {

@@ -53,4 +53,9 @@ public class RoleServiceImpl implements RoleService {
                 .build();
     }
 
+    @Override
+    public boolean roleIdsExist(List<Long> roleIds) {
+        log.info("{} Check roles by ids", LOG_PREFIX);
+        return rolePersistence.roleIdsExist(roleIds);
+    }
 }
