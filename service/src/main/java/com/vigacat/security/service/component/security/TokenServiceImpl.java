@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,14 +35,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public TokenDto getValidToken(String token) {
-        TokenDto tokenDto = tokenPersistence.getToken(token)
-                .orElseThrow(() -> new BadCredentialsException("Invalid"));
-        if(LocalDateTime.now().isBefore(tokenDto.getExpiresAt())){
-            return tokenDto;
-        } else {
-            throw new BadCredentialsException("Expired");
-        }
+    public Optional<TokenDto> getToken(String token) {
+        return tokenPersistence.getToken(token);
     }
 
 }

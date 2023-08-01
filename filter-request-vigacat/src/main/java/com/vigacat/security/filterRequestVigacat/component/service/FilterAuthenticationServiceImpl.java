@@ -1,11 +1,11 @@
-package com.vigacat.security.service.component.security;
+package com.vigacat.security.filterRequestVigacat.component.service;
 
-import com.vigacat.security.persistence.component.PermissionPersistence;
-import com.vigacat.security.persistence.component.UserPersistence;
-import com.vigacat.security.persistence.dto.PermissionDto;
-import com.vigacat.security.persistence.dto.RoleDto;
-import com.vigacat.security.persistence.dto.TokenDto;
-import com.vigacat.security.persistence.dto.UserDto;
+import com.vigacat.security.filterRequestVigacat.component.request.PermissionRequest;
+import com.vigacat.security.filterRequestVigacat.component.request.UserRequest;
+import com.vigacat.security.filterRequestVigacat.dto.RoleDto;
+import com.vigacat.security.filterRequestVigacat.dto.TokenDto;
+import com.vigacat.security.filterRequestVigacat.dto.UserDto;
+import com.vigacat.security.filterRequestVigacat.dto.PermissionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,16 +21,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class FilterAuthenticationServiceImpl implements FilterAuthenticationService {
 
-    private static final String LOG_PREFIX = "Authentication Service >>";
-    private final UserPersistence userPersistence;
-    private final PermissionPersistence permissionPersistence;
+    private static final String LOG_PREFIX = "Filter Authentication Service >>";
+    private final UserRequest userRequest;
+    private final PermissionRequest permissionRequest;
 
     @Override
     public Authentication buildAuthentication(TokenDto tokenDto, Long appId) {
         final String username = tokenDto.getUsername();
-        final UserDto userDto = userPersistence.getUserByUsernameAndApp(username, appId);
+        final UserDto userDto = userRequest.getUserByUsernameAndApp(username, appId);
 
         log.info("{} Build Authentication for name {} and app Id {}", LOG_PREFIX, username, appId);
 
@@ -58,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private Set<GrantedAuthority> createPermissionsAuthorities(List<Long> roleIds) {
-        return permissionPersistence.getPermissionsByRoleIds(roleIds).stream()
+        return permissionRequest.getPermissionsByRoleIds(roleIds).stream()
                 .map(PermissionDto::getPermission)
                 .map(permissionName -> createSimpleAuthority("permission", permissionName))
                 .collect(Collectors.toSet());
