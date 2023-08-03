@@ -37,11 +37,6 @@
         </dependency>
 
         <!-- EXTERNAL -->
-        <dependency>
-            <groupId>com.vigacat.security.filter</groupId>
-            <artifactId>filter-request-vigacat</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
         <!-- INTERNAL -->
         <dependency>
@@ -49,7 +44,6 @@
             <artifactId>service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
     </dependencies>
 
     <build>

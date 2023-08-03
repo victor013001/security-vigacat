@@ -1,6 +1,6 @@
 package com.vigacat.security.web.config;
 
-import com.vigacat.security.filterRequestVigacat.component.TokenRequestFilter;
+import com.vigacat.security.web.config.filter.TokenRequestFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,9 +34,9 @@ public class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.csrf().disable()
-                .authorizeHttpRequests().requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
+                .authorizeHttpRequests().requestMatchers(AntPathRequestMatcher.antMatcher("/auth")).permitAll()
                 .and()
-                .authorizeHttpRequests().requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/auth/**")).permitAll()
+                .authorizeHttpRequests().requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/auth")).permitAll()
                 .and()
                 .authorizeHttpRequests().anyRequest().authenticated()
                 .and()
