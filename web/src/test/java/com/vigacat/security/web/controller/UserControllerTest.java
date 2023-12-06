@@ -1,10 +1,9 @@
 package com.vigacat.security.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vigacat.security.persistence.dto.RoleDto;
-import com.vigacat.security.persistence.dto.UserDto;
-import com.vigacat.security.persistence.dto.UserToSaveDto;
+import com.vigacat.security.persistence.dto.*;
 import com.vigacat.security.service.component.UserService;
+import com.vigacat.security.web.constant.HeaderConstant;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +95,7 @@ public class UserControllerTest {
         String userEmail = "user@email.com";
         String userPassword = "password";
 
-        List<Long> userRoleIds = List.of(1L,2L);
+        List<Long> userRoleIds = List.of(1L, 2L);
         List<RoleDto> userRolesDtos = List.of(
                 RoleDto.builder()
                         .id(1L)
@@ -132,6 +131,46 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(Matchers.is(userEmail)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].id").value(1L))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roles[1].id").value(2L))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void getUserRolesAndPermissions() throws Exception {
+
+        String username = "User";
+        String userToken = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
+        String appName = "Catalogue";
+        String permissionRead = "Read";
+
+        List<RoleDto> userRoleDtos = List.of(
+                RoleDto.builder()
+                        .id(1L)
+                        .build()
+        );
+
+        PermissionDto permissionDtoRead = PermissionDto.builder()
+                .permission(permissionRead)
+                .build();
+        List<PermissionDto> userPermissionDtos = List.of(
+                permissionDtoRead
+        );
+
+        UserRolesPermissionsDto userRolesPermissionsDto = UserRolesPermissionsDto.builder()
+                .name(username)
+                .roles(userRoleDtos)
+                .permissions(userPermissionDtos)
+                .build();
+
+        Mockito.when(userService.getUserRolesAndPermissionsByTokenAndAppName(userToken, appName))
+                        .thenReturn(userRolesPermissionsDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/filter")
+                        .header(HeaderConstant.AUTHORIZATION_NAME, userToken)
+                        .header(HeaderConstant.APPLICATION_NAME, appName))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(Matchers.is(username)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.permissions[0].permission").value(Matchers.is(permissionRead)))
                 .andDo(MockMvcResultHandlers.print());
     }
 

@@ -11,3 +11,9 @@ server:
 logging:
   level:
     root: info
+
+security:
+  url: http://localhost:8081
+
+app:
+  name: Security

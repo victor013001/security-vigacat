@@ -23,7 +23,6 @@ public class TokenServiceImplTest {
     @Mock
     private TokenPersistenceImpl tokenPersistence;
 
-
     @Test
     public void getValidToken() {
         String usernameVictor = "victor";

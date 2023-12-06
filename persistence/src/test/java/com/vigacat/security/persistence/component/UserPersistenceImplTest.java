@@ -1,6 +1,8 @@
 package com.vigacat.security.persistence.component;
 
+import com.vigacat.security.dao.entity.Role;
 import com.vigacat.security.dao.entity.User;
+import com.vigacat.security.dao.repository.RoleRepository;
 import com.vigacat.security.dao.repository.UserRepository;
 import com.vigacat.security.persistence.dto.UserDto;
 import com.vigacat.security.persistence.dto.UserToSaveDto;
@@ -28,6 +30,8 @@ public class UserPersistenceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private RoleRepository roleRepository;
 
     @Test
     public void getUserByUsernameAndApp() {
@@ -142,6 +146,13 @@ public class UserPersistenceImplTest {
 
         List<Long> userRoleIds = List.of(1L, 2L);
 
+        Role userRole1 = Role.builder()
+                .id(1L)
+                .build();
+        Role userRole2 = Role.builder()
+                .id(2L)
+                .build();
+
         UserToSaveDto userToSaveDto = UserToSaveDto.builder()
                 .name(username)
                 .email(userEmail)
@@ -153,6 +164,12 @@ public class UserPersistenceImplTest {
 
         Mockito.when(userRepository.save(Mockito.any(User.class)))
                 .thenReturn(userToSave);
+
+        Mockito.when(roleRepository.getReferenceById(1L))
+                .thenReturn(userRole1);
+
+        Mockito.when(roleRepository.getReferenceById(2L))
+                .thenReturn(userRole2);
 
         final UserDto userDtoResponse = userPersistence.saveNewUser(userToSaveDto, usernameAdminAuthenticated);
 

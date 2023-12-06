@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
         VigacatSecurityServiceConfig.class,
         VigacatPersistenceConfiguration.class,
         VigacatSecurityDaoConfig.class,
-        VigacatSecurityWebConfig.class
+        VigacatSecurityWebConfig.class,
 })
 public class VigacatApplication {
 

@@ -35,7 +35,7 @@ public class AuthenticationController {
             );
             return ResponseEntity.ok(tokenService.createToken(authentication.getName()));
         } catch (BadCredentialsException ex) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "credentials Invalid");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Credentials Invalid");
         }
     }
 
@@ -43,5 +43,4 @@ public class AuthenticationController {
     public ResponseEntity<String> getPasswordEncoded(@RequestParam("value") String password) {
         return ResponseEntity.ok(passwordEncoder.encode(password));
     }
-
 }

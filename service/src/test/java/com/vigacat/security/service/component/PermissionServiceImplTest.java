@@ -57,4 +57,35 @@ public class PermissionServiceImplTest {
                         "Read"
                 );
     }
+
+    @Test
+    public void getPermissionsByRoleIds() {
+
+        List<Long> roleIds = List.of(1L, 2L);
+
+        PermissionDto permissionDtoCreate = PermissionDto.builder()
+                .permission("Create")
+                .build();
+
+        PermissionDto permissionDtoRead = PermissionDto.builder()
+                .permission("Read")
+                .build();
+
+        List<PermissionDto> permissionDtos = List.of(
+                permissionDtoCreate,
+                permissionDtoRead
+        );
+
+        Mockito.when(permissionPersistence.getPermissionsByRoleIds(roleIds))
+                .thenReturn(permissionDtos);
+
+        final List<PermissionDto> permissionDtosResponse = permissionService.getPermissionsByRoleIds(roleIds);
+
+        Mockito.verify(permissionPersistence)
+                .getPermissionsByRoleIds(roleIds);
+
+        Assertions.assertThat(permissionDtosResponse)
+                .extracting(PermissionDto::getPermission)
+                .contains("Create", "Read");
+    }
 }

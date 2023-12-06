@@ -3,8 +3,10 @@ package com.vigacat.security.web.exceptions;
 import com.vigacat.security.service.exceptions.RoleCreateException;
 import com.vigacat.security.service.exceptions.UserCreateException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.LinkedHashMap;
@@ -23,6 +25,30 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Map<String, Object>> handleUserCreateException(UserCreateException userCreateException) {
         return ResponseEntity.status(userCreateException.getHttpStatus())
                 .body(userCreateExceptionBody(userCreateException));
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    protected ResponseEntity<Map<String, Object>> handleHttpClientErrorException(HttpClientErrorException httpClientErrorException) {
+        return ResponseEntity.status(httpClientErrorException.getStatusCode())
+                .body(createBodyHttpClientErrorException(httpClientErrorException));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException badCredentialsException) {
+        return ResponseEntity.badRequest()
+                .body(createBadCredentialExceptionBody(badCredentialsException));
+    }
+
+    private Map<String, Object> createBadCredentialExceptionBody(BadCredentialsException badCredentialsException) {
+        return Map.of("message", badCredentialsException.getMessage());
+    }
+
+    private Map<String, Object> createBodyHttpClientErrorException(HttpClientErrorException httpClientErrorException) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("message", httpClientErrorException.getMessage());
+        body.put("title", httpClientErrorException.getStatusText());
+        body.put("status", httpClientErrorException.getStatusCode().value());
+        return body;
     }
 
     private Map<String, Object> roleExceptionBody(RoleCreateException roleCreateException) {

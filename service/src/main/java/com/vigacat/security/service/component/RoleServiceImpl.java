@@ -32,6 +32,12 @@ public class RoleServiceImpl implements RoleService {
         return rolePersistence.saveNewRole(roleDto, appId, usernameAuthenticated);
     }
 
+    @Override
+    public boolean roleIdsExist(List<Long> roleIds) {
+        log.info("{} Check roles by ids", LOG_PREFIX);
+        return rolePersistence.roleIdsExist(roleIds);
+    }
+
     private void checkRoleNameUnique(String roleName, Long appId) {
         if (rolePersistence.roleNameExist(roleName, appId)) {
             throw new RoleCreateException(roleName, appId, RoleCreateException.Type.DUPLICATE_NAME);
@@ -51,11 +57,5 @@ public class RoleServiceImpl implements RoleService {
                 .name(roleName)
                 .permissions(rolePermissionsDto)
                 .build();
-    }
-
-    @Override
-    public boolean roleIdsExist(List<Long> roleIds) {
-        log.info("{} Check roles by ids", LOG_PREFIX);
-        return rolePersistence.roleIdsExist(roleIds);
     }
 }

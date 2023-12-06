@@ -1,9 +1,9 @@
 package com.vigacat.security.service.component;
 
 import com.vigacat.security.persistence.component.UserPersistence;
-import com.vigacat.security.persistence.dto.UserDto;
-import com.vigacat.security.persistence.dto.UserToSaveDto;
-import com.vigacat.security.persistence.dto.UsernamePasswordDto;
+import com.vigacat.security.persistence.dto.*;
+import com.vigacat.security.service.component.security.TokenService;
+import com.vigacat.security.service.component.security.util.VigacatSecurityContext;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -20,14 +21,27 @@ import java.util.Optional;
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
 
-    @Mock
-    private RoleService roleService;
-    @Spy
-    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Spy
+    private PasswordEncoder passwordEncoder;
+    @Spy
+    private ModelMapper modelMapper;
+
+    @Mock
+    private RoleService roleService;
     @Mock
     private UserPersistence userPersistence;
+    @Mock
+    private TokenService tokenService;
+    @Mock
+    private AppService appService;
+    @Mock
+    private PermissionService permissionService;
+    @Mock
+    private VigacatSecurityContext vigacatSecurityContext;
+
 
     @Test
     public void getUser() {
@@ -99,6 +113,9 @@ public class UserServiceImplTest {
         Mockito.when(roleService.roleIdsExist(Mockito.anyList()))
                 .thenReturn(true);
 
+        Mockito.when(vigacatSecurityContext.getUsernameAuthenticated())
+                        .thenReturn(usernameAdminAuthenticated);
+
         Mockito.when(userPersistence.saveNewUser(userToSaveDto, usernameAdminAuthenticated))
                 .thenReturn(userDto);
 
@@ -113,6 +130,65 @@ public class UserServiceImplTest {
         Assertions.assertThat(userDtoResponse)
                 .hasFieldOrPropertyWithValue("name", username)
                 .hasFieldOrPropertyWithValue("email", userEmail);
+    }
+
+    @Test
+    public void getUserRolesAndPermissionsByTokenAndAppName() {
+
+        String username = "User";
+        String userEmail = "user@email.com";
+        String tokenUser = "aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb";
+        String appName = "Security";
+
+        TokenDto tokenUserDto = TokenDto.builder()
+                .token(tokenUser)
+                .username(username)
+                .build();
+
+        List<Long> roleIds = List.of(1L);
+
+        List<RoleDto> userRoles = List.of(
+                RoleDto.builder().id(1L).build()
+        );
+
+        UserDto userDto = UserDto.builder()
+                .name(username)
+                .email(userEmail)
+                .roles(userRoles)
+                .build();
+
+        PermissionDto permissionDtoRead = PermissionDto.builder()
+                .permission("Read")
+                .build();
+
+        List<PermissionDto> userPermissionDtos = List.of(
+                permissionDtoRead
+        );
+
+        Mockito.when(tokenService.getValidToken(tokenUser))
+                .thenReturn(tokenUserDto);
+
+        Mockito.when(appService.getAppIdByName(appName))
+                .thenReturn(1L);
+
+        Mockito.when(userPersistence.getUserByUsernameAndApp(username, 1L))
+                .thenReturn(userDto);
+
+        Mockito.when(permissionService.getPermissionsByRoleIds(roleIds))
+                .thenReturn(userPermissionDtos);
+
+        final UserRolesPermissionsDto userRolesPermissionsDtoResponse = userService.getUserRolesAndPermissionsByTokenAndAppName(tokenUser,appName);
+
+        Assertions.assertThat(userRolesPermissionsDtoResponse)
+                .hasFieldOrPropertyWithValue("name", username);
+
+        Assertions.assertThat(userRolesPermissionsDtoResponse.getRoles())
+                .extracting(RoleDto::getId)
+                .contains(1L);
+
+        Assertions.assertThat(userRolesPermissionsDtoResponse.getPermissions())
+                .extracting(PermissionDto::getPermission)
+                .contains("Read");
     }
 
     @Test

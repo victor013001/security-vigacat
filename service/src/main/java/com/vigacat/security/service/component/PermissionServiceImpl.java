@@ -23,4 +23,10 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionPersistence.getPermissionsByNames(permissionNames);
     }
 
+    @Override
+    public List<PermissionDto> getPermissionsByRoleIds(List<Long> roleIds) {
+        log.info("{} Get permissions by list of role ids", LOG_PREFIX);
+        return permissionPersistence.getPermissionsByRoleIds(roleIds);
+    }
+
 }

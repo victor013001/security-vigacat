@@ -89,7 +89,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    public void getRolesByIds() {
+    public void roleIdsExist() {
 
         List<Long> roleIds = List.of(1L, 2L);
 

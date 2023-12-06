@@ -31,9 +31,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Authentication buildAuthentication(TokenDto tokenDto, Long appId) {
         final String username = tokenDto.getUsername();
         final UserDto userDto = userPersistence.getUserByUsernameAndApp(username, appId);
-
         log.info("{} Build Authentication for name {} and app Id {}", LOG_PREFIX, username, appId);
-
         return new UsernamePasswordAuthenticationToken(username, tokenDto.getToken(), createRolesAuthorities(userDto.getRoles()));
     }
 
@@ -47,7 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         List<Long> roleIds = roleDtoList.stream()
                 .map(RoleDto::getId)
                 .collect(Collectors.toList());
-        
+
         authorities.addAll(createPermissionsAuthorities(roleIds));
 
         return authorities;
