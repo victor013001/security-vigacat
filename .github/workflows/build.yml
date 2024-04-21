@@ -2,7 +2,7 @@ name: SonarCloud
 on:
   push:
     branches:
-      - QA/add_coverage
+      - feature/add_coverage
   pull_request:
     types: [ opened, synchronize, reopened ]
 jobs:
