@@ -1,7 +1,7 @@
 
 # Security Vigacat
 
-Security Vigacat is the security service for a video game catalogue application, built using Java and Spring. This project was created to practice and improve skills, focusing on key features such as user authentication, authorization, and role-based access control.
+Security Vigacat is the security microservice for a video game catalogue application, built using Java and Spring. This project was created to practice and improve skills, focusing on key features such as user authentication, authorization, and role-based access control.
 
 ## Technologies
 
