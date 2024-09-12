@@ -5,7 +5,9 @@ Security Vigacat is the security module for a video game catalogue application, 
 
 ## Technologies
 
-- Java / Spring Boot
+- Java
+- Spring Boot
+- Spring Security
 - Junit
 - Mockito
 - SQL
@@ -18,6 +20,7 @@ Security Vigacat is the security module for a video game catalogue application, 
 - User authentication and authorization
 - Role-based access control (RBAC)
 - Create and manage users and roles
+- WebClient to get roles and permissions 
 
 ## Appendix: Incomplete Features
 
