@@ -18,7 +18,6 @@ public class TokenServiceImpl implements TokenService {
 
     private static final Long TOKEN_DURATION_MINUTES = 60L;
 
-
     private final TokenPersistence tokenPersistence;
 
     @Override
