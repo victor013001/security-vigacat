@@ -10,7 +10,7 @@ Security Vigacat is the security module for a video game catalogue application, 
 - Spring Security
 - Junit
 - Mockito
-- SQL
+- MySQL
 - Flyway
 - Docker
 - JACOCO
