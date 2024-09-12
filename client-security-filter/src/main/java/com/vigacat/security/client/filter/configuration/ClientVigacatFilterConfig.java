@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @ComponentScan(basePackages = {"com.vigacat.security.client.filter.component"})
 public class ClientVigacatFilterConfig {
 
-    @Value("${security.url}")
+    @Value("${vigacat.security.url}")
     private String securityUrl;
 
     @Bean

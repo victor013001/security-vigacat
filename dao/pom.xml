@@ -38,12 +38,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
         </dependency>
-
-        <!-- EXTERNAL -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

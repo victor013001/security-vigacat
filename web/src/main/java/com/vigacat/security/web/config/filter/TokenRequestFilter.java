@@ -26,7 +26,7 @@ public class TokenRequestFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
     private final AuthenticationService authenticationService;
     private final AppService appService;
-    @Value("${app.name}")
+    @Value("${vigacat.app.name}")
     private String applicationName;
 
     @Override

@@ -13,7 +13,7 @@ public class UserRequestClientImpl implements UserRequestClient {
 
     private final WebClient webClient;
 
-    @Value("${app.name}")
+    @Value("${vigacat.app.name}")
     private String appName;
 
     @Override
